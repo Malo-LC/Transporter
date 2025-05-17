@@ -1,5 +1,5 @@
 import ky, { KyInstance } from 'ky';
-import { DeezerTracks } from '../types/DeezerApiTypes';
+import { DeezerTracks } from '../types/DeezerTypes';
 
 export class DeezerApiService {
   private readonly url: string;
