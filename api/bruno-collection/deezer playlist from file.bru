@@ -1,0 +1,15 @@
+meta {
+  name: deezer playlist from file
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/deezer/file
+  body: file
+  auth: inherit
+}
+
+body:file {
+  file: @file(C:\Users\malo\WebstormProjects\Transporter\api\files\malo_loved.csv) @contentType(text/csv; charset=utf-8)
+}
