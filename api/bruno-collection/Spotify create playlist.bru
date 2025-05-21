@@ -1,0 +1,15 @@
+meta {
+  name: Spotify create playlist
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{url}}/spotify/playlist?name=Transport
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: Transport
+}

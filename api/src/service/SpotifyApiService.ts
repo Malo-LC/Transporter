@@ -1,30 +1,18 @@
 import ky, { type KyInstance } from 'ky';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../config';
-import {
-  AddItemsToPlaylistResponse,
-  SpotifyPlaylist,
-  SpotifyRefreshToken,
-  SpotifySearchResponse,
-  SpotifyUser
-} from '../types/SpotifyTypes';
+import { AddItemsToPlaylistResponse, SpotifyPlaylist, SpotifyRefreshToken, SpotifySearchResponse, SpotifyUser } from '../types/SpotifyTypes';
 
 export class SpotifyApiService {
   private readonly baseUrl: string = 'https://api.spotify.com/v1/';
+  private readonly redirectUri: string = 'http://127.0.0.1:3000/spotify/callback';
   private readonly client: KyInstance;
-  private accessToken: string;
+  private accessToken: string | undefined;
 
   constructor() {
-    this.accessToken = '';
     this.client = ky.create({
       prefixUrl: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
-      },
-      retry: {
-        limit: 3,
-        methods: ['post', 'get'],
-        statusCodes: [401],
-        maxRetryAfter: 30 * 1000, // 30 seconds
       },
       hooks: {
         beforeRequest: [
@@ -32,19 +20,6 @@ export class SpotifyApiService {
             if (this.accessToken) {
               request.headers.set('Authorization', `Bearer ${this.accessToken}`);
             }
-          }
-        ],
-        beforeRetry: [
-          async ({ request, options, error, retryCount }) => {
-            console.log(`Retrying request ${request.url} (${retryCount}) due to error: ${error.name}`);
-            const searchParams = new URLSearchParams();
-            searchParams.set('grant_type', 'client_credentials');
-            searchParams.set('client_id', SPOTIFY_CLIENT_ID);
-            searchParams.set('client_secret', SPOTIFY_CLIENT_SECRET);
-
-            const token = await ky.post('https://accounts.spotify.com/api/token', { body: searchParams }).json<SpotifyRefreshToken>();
-            this.accessToken = token.access_token;
-            request.headers.set('Authorization', `token ${token.access_token}`);
           }
         ],
       }
@@ -123,5 +98,47 @@ export class SpotifyApiService {
     return await this.client
       .get('search', { searchParams })
       .json<SpotifySearchResponse>();
+  }
+
+  public computeLoginOauthUrl(): string {
+    const scope = 'playlist-modify-public playlist-modify-private user-read-private user-read-email';
+    const state = this.generateRandomString(16);
+    const responseType = 'code';
+
+    const params = new URLSearchParams({
+      client_id: SPOTIFY_CLIENT_ID,
+      redirect_uri: this.redirectUri,
+      scope,
+      response_type: responseType,
+      state: state,
+    });
+
+    return `https://accounts.spotify.com/authorize?${params.toString()}`;
+  }
+
+  public async fetchAccessToken(code: string, _state: string) {
+    const response = await ky.post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)}`,
+      },
+      searchParams: {
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: this.redirectUri,
+      }
+    }).json();
+    this.accessToken = response.access_token;
+    return response;
+  }
+
+  // TODO: move to utils
+  private generateRandomString(length: number): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
   }
 }
