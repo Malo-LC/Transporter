@@ -2,7 +2,7 @@ import ky, { type KyInstance } from 'ky';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } from '../config';
 import { AddItemsToPlaylistResponse, SpotifyPlaylist, SpotifyRefreshToken, SpotifySearchResponse, SpotifyUser } from '../types/SpotifyTypes';
 
-export class SpotifyApiService {
+class SpotifyApiService {
   private readonly baseUrl: string = 'https://api.spotify.com/v1/';
   private readonly redirectUri: string = 'http://127.0.0.1:3000/spotify/callback';
   private readonly client: KyInstance;
@@ -35,7 +35,10 @@ export class SpotifyApiService {
     name: string,
     description: string = '',
     isPublic: boolean = true,
-  ): Promise<SpotifyPlaylist> {
+  ): Promise<SpotifyPlaylist | null> {
+    if (!this.accessToken) {
+      return null;
+    }
     const userId = await this.getCurrentUserId();
 
     const playlistData = {
@@ -78,7 +81,7 @@ export class SpotifyApiService {
   public async searchTrack(
     songName: string,
     artistName: string,
-    albumName: string,
+    albumName?: string,
   ): Promise<SpotifySearchResponse> {
     let query = `track:${songName.trim()}`;
     if (artistName) {
@@ -91,7 +94,6 @@ export class SpotifyApiService {
     const searchParams = new URLSearchParams({
       q: query,
       type: 'track',
-      market: 'FR',
       limit: '1',
     });
 
@@ -142,3 +144,7 @@ export class SpotifyApiService {
     return result;
   }
 }
+
+const spotifyApiService = new SpotifyApiService();
+
+export default spotifyApiService;

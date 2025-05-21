@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
-import { SpotifyApiService } from '../service/SpotifyApiService';
 import { SearchTrackRequest } from '../types/SpotifyTypes';
+import spotifyApiService from '../service/SpotifyApiService';
 
 // For testing purposes
 const spotifyController = new Hono();
-const spotifyApiService = new SpotifyApiService();
 
 spotifyController.post('/search/track', async (c) => {
   const body = await c.req.json<SearchTrackRequest>();
