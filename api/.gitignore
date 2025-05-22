@@ -7,6 +7,8 @@ yarn-debug.log*
 yarn-error.log*
 .yarn/cache
 .yarn/unplugged
+.yarn/sdks
+.yarn/install-state.gz
 /.pnp
 .pnp.js
 

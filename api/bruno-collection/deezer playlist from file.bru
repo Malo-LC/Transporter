@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{url}}/deezer/file
+  url: {{url}}/deezer/file?isLikes=true
   body: file
   auth: inherit
+}
+
+params:query {
+  isLikes: true
 }
 
 body:file {

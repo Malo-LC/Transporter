@@ -1,14 +1,4 @@
-export type CsvTrackData = {
-  trackName: string;
-  artistName: string;
-  album: string;
-  deezerId: string;
-}
-
-export type CsvFileData = {
-  tracks: CsvTrackData[];
-  playlistName: string;
-}
+import { CsvFileData, TrackData } from '../types/DeezerTypes';
 
 export class DeezerFileService {
   public static parseCsv(csvContent: string): CsvFileData | null {
@@ -26,7 +16,7 @@ export class DeezerFileService {
 
     let playlistName = dataLines[0].split(',')[3]?.trim().replaceAll('"', '') ?? '';
 
-    const tracks: CsvTrackData[] = [];
+    const tracks: TrackData[] = [];
 
     for (const dataLine of dataLines) {
       const values = dataLine.split(',');
@@ -36,11 +26,10 @@ export class DeezerFileService {
         continue; // Ignore cette ligne et passe à la suivante
       }
 
-      const trackData: CsvTrackData = {
+      const trackData: TrackData = {
         trackName: values[0]?.trim().replaceAll('"', '') ?? '',
         artistName: values[1]?.trim().replaceAll('"', '') ?? '',
-        album: values[2]?.trim().replaceAll('"', '') ?? '',
-        deezerId: values[6]?.trim().replaceAll('"', '') ?? '',
+        albumName: values[2]?.trim().replaceAll('"', '') ?? '',
       };
 
       // Ajouter la piste uniquement si elle a un nom

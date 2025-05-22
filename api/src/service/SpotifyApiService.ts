@@ -25,6 +25,10 @@ class SpotifyApiService {
       }
     });
   }
+  
+  public hasAccessToken(): boolean {
+    return !!this.accessToken;
+  }
 
   private async getCurrentUserId(): Promise<string> {
     const user = await this.client.get('me').json<SpotifyUser>();
@@ -35,10 +39,7 @@ class SpotifyApiService {
     name: string,
     description: string = '',
     isPublic: boolean = true,
-  ): Promise<SpotifyPlaylist | null> {
-    if (!this.accessToken) {
-      return null;
-    }
+  ): Promise<SpotifyPlaylist> {
     const userId = await this.getCurrentUserId();
 
     const playlistData = {
@@ -47,7 +48,7 @@ class SpotifyApiService {
       public: isPublic,
     };
 
-    return await this.client
+    return this.client
       .post(`users/${userId}/playlists`, { json: playlistData })
       .json<SpotifyPlaylist>();
   }
@@ -73,7 +74,7 @@ class SpotifyApiService {
       uris: trackUris,
     };
 
-    return await this.client
+    return this.client
       .post(`playlists/${playlistId}/tracks`, { json: data })
       .json<AddItemsToPlaylistResponse>();
   }
@@ -97,9 +98,28 @@ class SpotifyApiService {
       limit: '1',
     });
 
-    return await this.client
+    return this.client
       .get('search', { searchParams })
       .json<SpotifySearchResponse>();
+  }
+
+  public async addItemsToLikedTracks(
+    trackUris: string[],
+  ): Promise<AddItemsToPlaylistResponse | null> {
+    if (!this.accessToken) {
+      throw new Error('L\'access token est requis.');
+    }
+    if (!trackUris || trackUris.length === 0) {
+      return null;
+    }
+
+    const data = {
+      ids: trackUris,
+    };
+
+    return this.client
+      .post('me/tracks', { json: data })
+      .json<AddItemsToPlaylistResponse>();
   }
 
   public computeLoginOauthUrl(): string {
@@ -119,10 +139,11 @@ class SpotifyApiService {
   }
 
   public async fetchAccessToken(code: string, _state: string) {
+    const basicAuth: string = btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`);
     const response = await ky.post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)}`,
+        'Authorization': `Basic ${basicAuth}`,
       },
       searchParams: {
         grant_type: 'authorization_code',

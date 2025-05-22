@@ -1,10 +1,3 @@
-export type DeezerToken = {
-  access_token: string;
-  expires_in: number;
-  token_type: string;
-  refresh_token: string;
-}
-
 export type DeezerTrack = {
   id: number;
   readable: boolean;
@@ -37,22 +30,6 @@ export type DeezerAlbum = {
   type: string;
 };
 
-export type DeezerAlbumDetailed = DeezerAlbum & {
-  genre_id: number;
-  genres: DeezerGenres;
-  label: string;
-  nb_tracks: number;
-  duration: number;
-  fans: number;
-  release_date: string;
-  record_type: string;
-  artist: DeezerArtist;
-  contributors: DeezerArtist[];
-  available: boolean;
-  tracks: DeezerTracks;
-  error?: boolean;
-};
-
 export type DeezerArtist = {
   id: number;
   name: string;
@@ -66,23 +43,6 @@ export type DeezerArtist = {
   type: string;
 };
 
-export type DeezerArtistDetailed = DeezerArtist & {
-  nb_album: number;
-  nb_fan: number;
-  radio: boolean;
-};
-
-export type DeezerTrackDetailed = DeezerTrack & {
-  link: string;
-  track_position: number;
-  disk_number: number;
-  release_date: string;
-  preview: string;
-  bpm: number;
-  gain: number;
-  contributors: DeezerArtist[];
-};
-
 export type DeezerTracks = {
   data: DeezerTrack[];
   total: number;
@@ -90,17 +50,20 @@ export type DeezerTracks = {
   next: string;
 };
 
-export type DeezerGenres = {
-  data: DeezerGenre[];
+export type CreateSpotifyPlaylistBody = {
+  name?: string;
+  description?: string;
+  public?: boolean;
+  isLikes?: boolean;
 };
 
-export type DeezerGenre = {
-  id: number;
-  name: string;
-  picture: string;
-  picture_small: string;
-  picture_medium: string;
-  picture_big: string;
-  picture_xl: string;
-  type: string;
-};
+export type TrackData = {
+  trackName: string;
+  artistName: string;
+  albumName: string;
+}
+
+export type CsvFileData = {
+  tracks: TrackData[];
+  playlistName: string;
+}

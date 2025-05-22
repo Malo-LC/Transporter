@@ -4,12 +4,14 @@ meta {
   seq: 3
 }
 
-get {
-  url: {{url}}/deezer/playlists/13114760163/to-spotify?name=Tech
-  body: none
+post {
+  url: {{url}}/deezer/playlists/8919075682/to-spotify
+  body: json
   auth: inherit
 }
 
-params:query {
-  name: Tech
+body:json {
+  {
+    "isLikes": "Autres"
+  }
 }

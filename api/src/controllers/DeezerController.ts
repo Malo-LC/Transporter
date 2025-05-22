@@ -2,83 +2,75 @@ import { Hono } from 'hono';
 import { DeezerApiService } from '../service/DeezerApiService';
 import { DeezerFileService } from '../service/DeezerFileService';
 import spotifyApiService from '../service/SpotifyApiService';
+import { CreateSpotifyPlaylistBody, TrackData } from '../types/DeezerTypes';
+import deezerService from '../service/DeezerService';
+import spotifyService from '../service/SpotifyService';
 
 const deezerController = new Hono();
 const deezerApiService = new DeezerApiService();
 
-deezerController.get('/playlists/:playlistId/to-spotify', async (c) => {
+deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
+  const t0 = performance.now();
   const playlistId = c.req.param('playlistId');
-  const name = c.req.query("name");
+  const { name, description, public: isPublic, isLikes = false } = await c.req.json<CreateSpotifyPlaylistBody>();
 
-  if (!name) {
+  if (!name && !isLikes) {
     return c.json({ message: 'No playlist name provided' }, 400);
   }
 
-  const deezerTracks = await deezerApiService.fetchPlaylist(playlistId);
-
-  if (!deezerTracks.data) {
-    return c.json({ message: 'No data found' }, 404);
+  if (!spotifyApiService.hasAccessToken()) {
+    return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
-  console.info('Fetched deezer playlist ', playlistId, ' with ', deezerTracks.data.length, ' tracks');
+  const deezerPlaylistTracks = await deezerApiService.fetchPlaylist(playlistId);
 
-  const newSpotifyPlaylist = await spotifyApiService.createPlaylist(name);
-
-  if (!newSpotifyPlaylist?.id) {
-    return c.json({ message: 'Error creating Spotify playlist', newSpotifyPlaylist }, 500);
-  }
-  console.info('Created Spotify playlist ', newSpotifyPlaylist.id);
-
-  let spotifyUris: string[] = []
-
-  for (let i = 0; i < deezerTracks.data.length; i++) {
-    // 1: Search for the track on Spotify
-    const track = deezerTracks.data[i];
-    const searchResult = await spotifyApiService.searchTrack(
-      track.title,
-      track.artist.name
-    );
-    if (searchResult?.tracks?.items?.length) {
-      const spotifyTrack = searchResult.tracks.items[0];
-      spotifyUris.push(spotifyTrack.uri);
-    } else {
-      // Retry with removing things in ()
-      const trackName = track.title.replace(/\s*\(.*?\)\s*/g, '').trim();
-      const searchResult = await spotifyApiService.searchTrack(
-        trackName,
-        track.artist.name
-      );
-      if (searchResult?.tracks?.items?.length) {
-        const spotifyTrack = searchResult.tracks.items[0];
-        spotifyUris.push(spotifyTrack.uri);
-      } else {
-        console.warn('Track not found on Spotify ', track.title, ' by ', track.artist.name);
-      }
-    }
-    // 2: Add the track to the Spotify playlist
-    if (spotifyUris.length > 90) { // Spotify API limit is 100 tracks per request
-      await spotifyApiService.addSongsToPlaylist(newSpotifyPlaylist.id, spotifyUris);
-      console.info('Added ', spotifyUris.length, ' tracks to Spotify playlist ', newSpotifyPlaylist.id);
-      spotifyUris = []; // Reset the array
-    }
-    // display progress
-    if (i % 10 === 0) {
-      console.info('Processed ', i / deezerTracks.data.length * 100, '% of the tracks');
-    }
-  }
-  // Add remaining tracks
-  if (spotifyUris.length > 0) {
-    await spotifyApiService.addSongsToPlaylist(newSpotifyPlaylist.id, spotifyUris);
-    console.info('Added ', spotifyUris.length, ' tracks to Spotify playlist ', newSpotifyPlaylist.id);
+  if (!deezerPlaylistTracks.data || deezerPlaylistTracks.data.length === 0) {
+    return c.json({ message: 'No tracks found for this Deezer playlist' }, 404);
   }
 
-  console.info('Added all tracks to Spotify playlist ', newSpotifyPlaylist.id);
+  const deezerTracks: TrackData[] = deezerPlaylistTracks.data.map((track) => ({
+    trackName: track.title,
+    artistName: track.artist.name,
+    albumName: track.album.title,
+  }));
 
-  return c.json(deezerTracks);
+  console.info(`Fetched Deezer playlist "${playlistId}" with ${deezerTracks.length} tracks.`);
+
+  // Create or get Spotify playlist
+  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(name, isLikes, description, isPublic);
+
+  if (!spotifyPlaylistId) {
+    return c.json({ message: 'Failed to create or find Spotify playlist' }, 500);
+  }
+
+  // Transfer tracks to Spotify
+  const missingTracks = await deezerService.transferTracksToSpotify(deezerTracks, spotifyPlaylistId, isLikes);
+
+  console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
+
+  return c.json({
+      message: 'Playlist transferred successfully',
+      spotifyPlaylistId,
+      time: ((performance.now() - t0) / 1000).toFixed(2) + ' seconds',
+      missingTracks,
+    },
+    200
+  );
 });
 
 deezerController.post('/file', async (c) => {
+  const t0 = performance.now();
   const file = await (await c.req.blob()).text();
+
+  const { name, isLikes } = c.req.query();
+
+  if (!name && !isLikes) {
+    return c.json({ message: 'No playlist name provided' }, 400);
+  }
+
+  if (!spotifyApiService.hasAccessToken()) {
+    return c.json({ message: 'Spotify access token is missing' }, 401);
+  }
 
   const playlist = DeezerFileService.parseCsv(file);
 
@@ -88,7 +80,26 @@ deezerController.post('/file', async (c) => {
 
   console.info('Fetched deezer playlist ', playlist.playlistName, ' with ', playlist.tracks.length, ' tracks');
 
-  return c.json(playlist);
+  // Create or get Spotify playlist
+  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(name, !!isLikes);
+
+  if (!spotifyPlaylistId) {
+    return c.json({ message: 'Failed to create or find Spotify playlist' }, 500);
+  }
+
+  // Transfer tracks to Spotify
+  const missingTracks = await deezerService.transferTracksToSpotify(playlist.tracks, spotifyPlaylistId, !!isLikes);
+
+  console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
+
+  return c.json({
+      message: 'Playlist transferred successfully',
+      spotifyPlaylistId,
+      time: ((performance.now() - t0) / 1000).toFixed(2) + ' seconds',
+      missingTracks,
+    },
+    200
+  );
 });
 
 export default deezerController;
