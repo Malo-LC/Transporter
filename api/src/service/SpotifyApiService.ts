@@ -118,12 +118,12 @@ class SpotifyApiService {
     };
 
     return this.client
-      .post('me/tracks', { json: data })
+      .put('me/tracks', { json: data })
       .json<AddItemsToPlaylistResponse>();
   }
 
   public computeLoginOauthUrl(): string {
-    const scope = 'playlist-modify-public playlist-modify-private user-read-private user-read-email';
+    const scope = 'playlist-modify-public playlist-modify-private user-read-private user-read-email user-library-modify';
     const state = this.generateRandomString(16);
     const responseType = 'code';
 
