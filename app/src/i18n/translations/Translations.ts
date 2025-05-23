@@ -40,7 +40,23 @@ export type Translations = {
   },
   // home
   home: {
+    loginToSpotify: string,
     title: string,
+  },
+  deezer: {
+    playlistName: string,
+    title: string,
+    playlistUrl: string,
+    export: string,
+    exportByFile: string,
+    exportByPlaylistId: string,
+  },
+  spotify: {
+    callback: string,
+    noCode: string,
+    success: string,
+    error: (error: string) => string,
+    connectedAs: (userId: string | undefined) => string,
   },
   login: {
     title: string,

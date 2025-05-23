@@ -1,21 +1,41 @@
 import { Hono } from 'hono';
-import { setSignedCookie } from 'hono/cookie';
-import { COOKIE_MAX_AGE, SECRET_COOKIE_KEY } from '../config';
+import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
+import { COOKIE_MAX_AGE, NODE_ENV, SECRET_COOKIE_KEY } from '../config';
 import spotifyApiService from '../service/SpotifyApiService';
-import { SearchTrackRequest } from '../types/SpotifyTypes';
 
-// For testing purposes
-const spotifyController = new Hono();
+type Context = {
+  userId: string | undefined;
+}
 
-spotifyController.post('/search/track', async (c) => {
-  const body = await c.req.json<SearchTrackRequest>();
+const spotifyController = new Hono<{ Variables: Context }>();
 
-  const tracks = await spotifyApiService.searchTrack(
-    body.songName,
-    body.artistName,
-    body.albumName
-  );
-  return c.json(tracks);
+spotifyController.use('/me', async (c, next) => {
+  const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, 'userId');
+
+  console.log('User ID from cookie:', userId);
+
+  c.set('userId', userId || undefined); // NOSONARR
+  await next();
+});
+
+spotifyController.get('/me', (c) => {
+  const userId = c.get('userId');
+
+  console.log('User ID:', userId);
+
+  if (!userId) {
+    deleteCookie(c, 'userId');
+    return c.json({
+      isAuthenticated: false,
+    });
+  }
+
+  const isAuthenticated = spotifyApiService.hasAccessToken(userId);
+
+  return c.json({
+    isAuthenticated,
+    userId,
+  });
 });
 
 spotifyController.get('/callback', async (c) => {
@@ -34,17 +54,17 @@ spotifyController.get('/callback', async (c) => {
     SECRET_COOKIE_KEY, {
       httpOnly: true,
       path: '/',
-      secure: true,
+      secure: NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: COOKIE_MAX_AGE,
     });
 
-  return c.redirect('/');
+  return c.json('Spotify authentication successful', 200);
 });
 
 spotifyController.get('/login', async (c) => {
   const url = spotifyApiService.computeLoginOauthUrl();
-  return c.redirect(url);
+  return c.json(url);
 });
 
 export default spotifyController;

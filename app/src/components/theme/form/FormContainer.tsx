@@ -1,6 +1,6 @@
 import { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
 import { PropsWithChildren } from 'react';
-import { FieldValues, FormContainer as MuiFormContainer, } from 'react-hook-form-mui';
+import { FieldValues, FormContainer as MuiFormContainer } from 'react-hook-form-mui';
 
 import './forms.module.scss';
 

@@ -46,6 +46,22 @@ const frMessages: Translations = {
   // home
   home: {
     title: 'Page d\'accueil',
+    loginToSpotify: 'Se connecter à Spotify',
+  },
+  deezer: {
+    title: 'Deezer',
+    playlistUrl: 'URL de la playlist Deezer',
+    export: 'Exporter',
+    exportByFile: 'Exporter par fichier',
+    exportByPlaylistId: 'Exporter par ID de playlist',
+    playlistName: 'Nom de la playlist',
+  },
+  spotify: {
+    error: (error: string) => `Erreur de connexion à Spotify : ${error}`,
+    success: 'Authentification Spotify réussie',
+    noCode: 'Aucun code fourni dans l\'URL',
+    callback: 'Authentification Spotify en cours, veuillez patienter...',
+    connectedAs: (userId: string | undefined) => `Connecté en tant que ${userId}`,
   },
   login: {
     title: 'Se connecter',

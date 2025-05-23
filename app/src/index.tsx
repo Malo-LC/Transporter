@@ -11,7 +11,7 @@ import installServicesModule from '@services/services-module';
 import SessionService from '@services/session/SessionService';
 import { configureGlobalInjector, Injector } from 'plume-ts-di';
 import './polyfill-loader';
-import { JSX, StrictMode } from 'react';
+import { JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Logger } from 'simple-logging-system';
 
@@ -38,9 +38,7 @@ initializeLocalizedDate(injector.getInstance(LocaleService));
 injector.getInstance(NotificationRenderer).initialize();
 
 const reactApp: JSX.Element = (
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <App />
 );
 const rootElement: HTMLElement | null = document.getElementById('root');
 if (!rootElement) {

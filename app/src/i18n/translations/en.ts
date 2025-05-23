@@ -46,6 +46,22 @@ const enMessages: Translations = {
   // home
   home: {
     title: 'Home page',
+    loginToSpotify: 'Log in to Spotify',
+  },
+  deezer: {
+    title: 'Deezer',
+    playlistUrl: 'Deezer playlist URL',
+    export: 'Export',
+    exportByFile: 'Export by file',
+    exportByPlaylistId: 'Export by playlist ID',
+    playlistName : 'Playlist name',
+  },
+  spotify: {
+    error: (error: string) => `Spotify connection error: ${error}`,
+    noCode: 'No code provided in the URL',
+    callback: 'Spotify authentication in progress, please wait...',
+    success: 'Spotify authentication successful',
+    connectedAs: (userId: string | undefined) => `Connected as ${userId}`,
   },
   login: {
     title: 'Please authenticate',

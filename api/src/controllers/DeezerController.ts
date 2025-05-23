@@ -16,7 +16,7 @@ const deezerController = new Hono<{ Variables: Context }>();
 const deezerApiService = new DeezerApiService();
 
 deezerController.use('*', async (c, next) => {
-  const userId = await getSignedCookie(c, 'userId', SECRET_COOKIE_KEY);
+  const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, 'userId');
   if (!userId) {
     return c.json({ message: 'User ID is missing' }, 401);
   }

@@ -1,6 +1,6 @@
-import { createRouter, defineRoute } from 'type-route';
+import { createRouter, defineRoute, param } from 'type-route';
 
-export const LOGIN: 'login' = 'login'; // NOSONARR
+export const SPOTIFY_CALLBACK: 'spotify' = 'spotify'; // NOSONARR
 export const ROUTE_HOME: 'home' = 'home'; // NOSONARR
 
 export const { RouteProvider, useRoute, routes } = createRouter(
@@ -8,8 +8,14 @@ export const { RouteProvider, useRoute, routes } = createRouter(
     scrollToTop: true,
   },
   {
-    [LOGIN]: defineRoute('/login'),
     [ROUTE_HOME]: defineRoute('/'),
+    [SPOTIFY_CALLBACK]: defineRoute(
+      {
+        code: param.query.optional.string,
+        error: param.query.optional.string,
+      },
+      () => '/spotify/callback',
+    ),
   },
 );
 

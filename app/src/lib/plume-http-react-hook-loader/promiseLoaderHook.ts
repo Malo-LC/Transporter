@@ -62,7 +62,7 @@ export type LoaderState = {
  */
 export default function useLoader(): LoaderState {
   const isMountedRef: RefObject<boolean> = useRef<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingError, setLoadingError] = useState<HttpError>();
 
   useOnComponentUnMounted(() => () => {

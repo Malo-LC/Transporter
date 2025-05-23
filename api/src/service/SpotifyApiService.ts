@@ -195,6 +195,7 @@ class SpotifyApiService {
       expiresAt: Date.now() + tokenResponse.expires_in * 1000,
     });
 
+    console.log(this.accessTokens);
     return user.id;
   }
 

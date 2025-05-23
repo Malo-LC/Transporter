@@ -9,7 +9,7 @@ const LOCAL_STORAGE_CURRENT_SESSION: string = 'user-session';
 const HTTP_ERROR_ALREADY_EXPIRED_SESSION_TOKEN: string = 'ALREADY_EXPIRED_SESSION_TOKEN';
 
 export default class SessionService {
-  private jwtSessionManager: JwtSessionManager<UserWithExpiration>;
+  private readonly jwtSessionManager: JwtSessionManager<UserWithExpiration>;
 
   constructor(
     private readonly sessionApi: SessionApi,
