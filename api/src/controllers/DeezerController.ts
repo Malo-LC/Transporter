@@ -5,20 +5,42 @@ import spotifyApiService from '../service/SpotifyApiService';
 import { CreateSpotifyPlaylistBody, TrackData } from '../types/DeezerTypes';
 import deezerService from '../service/DeezerService';
 import spotifyService from '../service/SpotifyService';
+import { getSignedCookie } from 'hono/cookie';
+import { SECRET_COOKIE_KEY } from '../config';
 
-const deezerController = new Hono();
+type Context = {
+  userId: string | undefined;
+}
+
+const deezerController = new Hono<{ Variables: Context }>();
 const deezerApiService = new DeezerApiService();
+
+deezerController.use('*', async (c, next) => {
+  const userId = await getSignedCookie(c, 'userId', SECRET_COOKIE_KEY);
+  if (!userId) {
+    return c.json({ message: 'User ID is missing' }, 401);
+  }
+  c.set('userId', userId);
+  await next();
+});
 
 deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
   const t0 = performance.now();
+
+  const userId = c.get('userId');
   const playlistId = c.req.param('playlistId');
+
   const { name, description, public: isPublic, isLikes = false } = await c.req.json<CreateSpotifyPlaylistBody>();
 
   if (!name && !isLikes) {
     return c.json({ message: 'No playlist name provided' }, 400);
   }
 
-  if (!spotifyApiService.hasAccessToken()) {
+  if (!userId) {
+    return c.json({ message: 'User ID is missing' }, 401);
+  }
+
+  if (!spotifyApiService.hasAccessToken(userId)) {
     return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
@@ -37,14 +59,14 @@ deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
   console.info(`Fetched Deezer playlist "${playlistId}" with ${deezerTracks.length} tracks.`);
 
   // Create or get Spotify playlist
-  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(name, isLikes, description, isPublic);
+  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(userId, name, isLikes, description, isPublic);
 
   if (!spotifyPlaylistId) {
     return c.json({ message: 'Failed to create or find Spotify playlist' }, 500);
   }
 
   // Transfer tracks to Spotify
-  const missingTracks = await deezerService.transferTracksToSpotify(deezerTracks, spotifyPlaylistId, isLikes);
+  const missingTracks = await deezerService.transferTracksToSpotify(userId, deezerTracks, spotifyPlaylistId, isLikes);
 
   console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
 
@@ -60,6 +82,7 @@ deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
 
 deezerController.post('/file', async (c) => {
   const t0 = performance.now();
+  const userId = c.get('userId');
   const file = await (await c.req.blob()).text();
 
   const { name, isLikes } = c.req.query();
@@ -68,7 +91,11 @@ deezerController.post('/file', async (c) => {
     return c.json({ message: 'No playlist name provided' }, 400);
   }
 
-  if (!spotifyApiService.hasAccessToken()) {
+  if (!userId) {
+    return c.json({ message: 'User ID is missing' }, 401);
+  }
+
+  if (!spotifyApiService.hasAccessToken(userId)) {
     return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
@@ -81,14 +108,14 @@ deezerController.post('/file', async (c) => {
   console.info('Fetched deezer playlist ', playlist.playlistName, ' with ', playlist.tracks.length, ' tracks');
 
   // Create or get Spotify playlist
-  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(name, !!isLikes);
+  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(userId, name, !!isLikes);
 
   if (!spotifyPlaylistId) {
     return c.json({ message: 'Failed to create or find Spotify playlist' }, 500);
   }
 
   // Transfer tracks to Spotify
-  const missingTracks = await deezerService.transferTracksToSpotify(playlist.tracks, spotifyPlaylistId, !!isLikes);
+  const missingTracks = await deezerService.transferTracksToSpotify(userId, playlist.tracks, spotifyPlaylistId, !!isLikes);
 
   console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
 

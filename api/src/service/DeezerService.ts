@@ -7,6 +7,7 @@ class DeezerService {
    * Transfer tracks to Spotify playlist or liked songs
    */
   public async transferTracksToSpotify(
+    userId: string,
     tracks: TrackData[],
     spotifyPlaylistId: string,
     isLikes: boolean = false
@@ -20,12 +21,12 @@ class DeezerService {
       let spotifyTrackId: string | null = null;
 
       // Attempt to search for the track on Spotify
-      let searchResult = await spotifyApiService.searchTrack(track.trackName, track.artistName);
+      let searchResult = await spotifyApiService.searchTrack(userId, track.trackName, track.artistName);
 
       // If not found, retry by removing parenthesized content from the track title
       if (!searchResult?.tracks?.items?.length) {
         const cleanTrackName = track.trackName.replace(/\s*\(.*?\)\s*/g, '').trim();
-        searchResult = await spotifyApiService.searchTrack(cleanTrackName, track.artistName);
+        searchResult = await spotifyApiService.searchTrack(userId, cleanTrackName, track.artistName);
       }
 
       if (searchResult?.tracks?.items?.length) {
@@ -38,7 +39,7 @@ class DeezerService {
 
       // Add tracks to Spotify in batches
       if (spotifyUris.length >= BATCH_SIZE) {
-        await spotifyService.addTracksToSpotify(spotifyPlaylistId, spotifyUris, isLikes);
+        await spotifyService.addTracksToSpotify(userId, spotifyPlaylistId, spotifyUris, isLikes);
         spotifyUris.length = 0; // Clear the array
       }
 
@@ -50,7 +51,7 @@ class DeezerService {
 
     // Add any remaining tracks
     if (spotifyUris.length > 0) {
-      await spotifyService.addTracksToSpotify(spotifyPlaylistId, spotifyUris, isLikes);
+      await spotifyService.addTracksToSpotify(userId, spotifyPlaylistId, spotifyUris, isLikes);
     }
 
     return missingTracks;

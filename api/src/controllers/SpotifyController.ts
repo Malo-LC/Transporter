@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { SearchTrackRequest } from '../types/SpotifyTypes';
 import spotifyApiService from '../service/SpotifyApiService';
+import { setSignedCookie } from 'hono/cookie';
+import { COOKIE_MAX_AGE, SECRET_COOKIE_KEY } from '../config';
 
 // For testing purposes
 const spotifyController = new Hono();
@@ -18,17 +20,26 @@ spotifyController.post('/search/track', async (c) => {
 
 spotifyController.get('/callback', async (c) => {
   const code = c.req.query('code');
-  const state = c.req.query('state');
 
-  if (!code || !state) {
-    return c.json({ message: 'No code or state provided' }, 400);
+  if (!code) {
+    return c.json({ message: 'No code provided' }, 400);
   }
 
-  const token = await spotifyApiService.fetchAccessToken(code, state);
+  const userId = await spotifyApiService.fetchAndSetAccessToken(code);
 
-  console.info('Added token');
+  await setSignedCookie(
+    c,
+    'userId',
+    userId,
+    SECRET_COOKIE_KEY, {
+      httpOnly: true,
+      path: '/',
+      secure: true,
+      sameSite: 'strict',
+      maxAge: COOKIE_MAX_AGE,
+    });
 
-  return c.json(token);
+  return c.redirect('/');
 });
 
 spotifyController.get('/login', async (c) => {
@@ -36,20 +47,5 @@ spotifyController.get('/login', async (c) => {
   return c.redirect(url);
 });
 
-spotifyController.post('/playlist', async (c) => {
-  const name = c.req.query("name");
-
-  if (!name) {
-    return c.json({ message: 'No name provided' }, 400);
-  }
-
-  const playlist = await spotifyApiService.createPlaylist(name);
-
-  if (!playlist) {
-    return c.json({ message: 'No data found' }, 404);
-  }
-
-  return c.json(playlist);
-});
 
 export default spotifyController;
