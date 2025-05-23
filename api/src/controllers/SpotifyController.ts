@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
-import { SearchTrackRequest } from '../types/SpotifyTypes';
-import spotifyApiService from '../service/SpotifyApiService';
 import { setSignedCookie } from 'hono/cookie';
 import { COOKIE_MAX_AGE, SECRET_COOKIE_KEY } from '../config';
+import spotifyApiService from '../service/SpotifyApiService';
+import { SearchTrackRequest } from '../types/SpotifyTypes';
 
 // For testing purposes
 const spotifyController = new Hono();
@@ -46,6 +46,5 @@ spotifyController.get('/login', async (c) => {
   const url = spotifyApiService.computeLoginOauthUrl();
   return c.redirect(url);
 });
-
 
 export default spotifyController;

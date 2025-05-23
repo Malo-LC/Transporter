@@ -17,7 +17,6 @@ class SpotifyService {
     console.info(`Added ${uris.length} tracks to Spotify playlist ${isLikes ? 'Liked Songs' : playlistId}.`);
   }
 
-
   /**
    * Create Spotify playlist or use liked songs
    */

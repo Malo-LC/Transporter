@@ -1,6 +1,6 @@
+import { TrackData } from '../types/DeezerTypes';
 import spotifyApiService from './SpotifyApiService';
 import spotifyService from './SpotifyService';
-import { TrackData } from '../types/DeezerTypes';
 
 class DeezerService {
   /**

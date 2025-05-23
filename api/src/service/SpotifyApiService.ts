@@ -1,6 +1,12 @@
 import ky, { type KyInstance } from 'ky';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI } from '../config';
-import { AddItemsToPlaylistResponse, SpotifyPlaylist, SpotifyRefreshToken, SpotifySearchResponse, SpotifyUser } from '../types/SpotifyTypes';
+import {
+  AddItemsToPlaylistResponse,
+  SpotifyPlaylist,
+  SpotifyRefreshToken,
+  SpotifySearchResponse,
+  SpotifyUser
+} from '../types/SpotifyTypes';
 
 type Token = {
   accessToken: string;
@@ -188,7 +194,7 @@ class SpotifyApiService {
       refreshToken: tokenResponse.refresh_token,
       expiresAt: Date.now() + tokenResponse.expires_in * 1000,
     });
-    
+
     return user.id;
   }
 

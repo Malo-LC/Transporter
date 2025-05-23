@@ -1,0 +1,44 @@
+.popin-container {
+  // as mui dialog
+  $popin-width: 600px;
+  $popin-padding: $spacer-6;
+
+  .popin {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: $border-radius-3;
+    width: $popin-width;
+    padding: $spacer-2 $popin-padding $spacer-4;
+
+    &_title {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      color: $secondary-color;
+      font-size: $font-size-extra-large;
+      height: 60px;
+    }
+
+    &_body {
+      display: flex;
+      flex-direction: column;
+      gap: $spacer-6;
+      text-align: left;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: $spacer-6;
+      padding: $spacer-6 $popin-padding;
+      height: 80px;
+
+      button {
+        height: $button-height;
+      }
+    }
+  }
+}
