@@ -55,6 +55,8 @@ const frMessages: Translations = {
     exportByFile: 'Exporter par fichier',
     exportByPlaylistId: 'Exporter par ID de playlist',
     playlistName: 'Nom de la playlist',
+    isLikes: 'Ajouter les titres à la playlist "J\'aime" ?',
+    chooseExportMethod: 'Veuillez choisir une méthode d\'exportation',
   },
   spotify: {
     error: (error: string) => `Erreur de connexion à Spotify : ${error}`,

@@ -44,6 +44,8 @@ export type Translations = {
     title: string,
   },
   deezer: {
+    chooseExportMethod: string,
+    isLikes: string,
     playlistName: string,
     title: string,
     playlistUrl: string,

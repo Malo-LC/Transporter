@@ -32,6 +32,10 @@ spotifyController.get('/me', (c) => {
 
   const isAuthenticated = spotifyApiService.hasAccessToken(userId);
 
+  if (!isAuthenticated) {
+    deleteCookie(c, 'userId');
+  }
+
   return c.json({
     isAuthenticated,
     userId,

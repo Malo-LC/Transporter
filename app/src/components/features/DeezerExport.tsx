@@ -4,47 +4,50 @@ import InputText from '@components/theme/form/fields/InputText';
 import useMessages, { Messages } from '@i18n/hooks/messagesHook';
 import useLoader, { LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
 import useNotification from '@lib/plume-notification/NotificationHook';
+import { Checkbox } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
 import { ChangeEvent } from 'react';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { FormContainer } from 'react-hook-form-mui';
+import scss from './deezer-export.module.scss';
 
-type FormValues = {
+export type FormValues = {
   file: File | undefined,
   playlistUrl: string,
   playlistName: string,
+  isLikes: boolean,
 };
 
 export default function DeezerExport() {
   const deezerApi: DeezerApi = getGlobalInstance(DeezerApi);
 
   const { messages }: Messages = useMessages();
-  const { notifyHttpError } = useNotification();
+  const { notifyHttpError, notifyError } = useNotification();
   const loader: LoaderState = useLoader();
 
   const formContext: UseFormReturn<FormValues> = useForm<FormValues>();
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
     const { file, playlistUrl } = data;
     if (file) {
       loader.monitor(
         deezerApi
-          .exportByFile(file)
+          .exportByFile(data)
           .catch(notifyHttpError),
       );
     } else if (playlistUrl) {
       loader.monitor(
         deezerApi
-          .exportByPlaylistId(playlistUrl)
+          .exportByPlaylistId(data)
           .catch(notifyHttpError),
       );
     }
+    notifyError(messages.deezer.chooseExportMethod);
   };
 
   return (
-    <div>
-      <FormContainer formContext={formContext} onSuccess={onSubmit}>
+    <FormContainer formContext={formContext} onSuccess={onSubmit}>
+      <div className={scss.deezerExport}>
         <input
           type="file"
           accept="text/csv"
@@ -62,10 +65,16 @@ export default function DeezerExport() {
             required: 'Please enter a playlist name',
           }}
         />
-        <ActionButton>
+        <div>
+          <label>
+            {messages.deezer.isLikes}
+          </label>
+          <Checkbox name="isLikes" />
+        </div>
+        <ActionButton disabled={loader.isLoading}>
           {messages.deezer.export}
         </ActionButton>
-      </FormContainer>
-    </div>
+      </div>
+    </FormContainer>
   );
 }

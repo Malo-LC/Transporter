@@ -54,7 +54,9 @@ const enMessages: Translations = {
     export: 'Export',
     exportByFile: 'Export by file',
     exportByPlaylistId: 'Export by playlist ID',
-    playlistName : 'Playlist name',
+    playlistName: 'Playlist name',
+    isLikes: 'Should add to "Likes" playlist?',
+    chooseExportMethod: 'Please choose an export method',
   },
   spotify: {
     error: (error: string) => `Spotify connection error: ${error}`,

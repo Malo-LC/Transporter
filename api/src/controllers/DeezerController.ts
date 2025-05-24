@@ -24,13 +24,20 @@ deezerController.use('*', async (c, next) => {
   await next();
 });
 
-deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
+deezerController.post('/playlists/to-spotify', async (c) => {
   const t0 = performance.now();
 
   const userId = c.get('userId');
-  const playlistId = c.req.param('playlistId');
+  const {
+    name, description, public: isPublic, isLikes = false, playlistUrl
+  } = await c.req.json<CreateSpotifyPlaylistBody>();
+  const regex = /(?:playlist\/|)(\d+)(?:[/?]|$)/m;
+  const match = playlistUrl?.match(regex);
+  const playlistId = match ? match[1] : null;
 
-  const { name, description, public: isPublic, isLikes = false } = await c.req.json<CreateSpotifyPlaylistBody>();
+  if (!playlistId) {
+    return c.json({ message: 'Invalid Deezer playlist URL' }, 400);
+  }
 
   if (!name && !isLikes) {
     return c.json({ message: 'No playlist name provided' }, 400);
@@ -83,9 +90,15 @@ deezerController.post('/playlists/:playlistId/to-spotify', async (c) => {
 deezerController.post('/file', async (c) => {
   const t0 = performance.now();
   const userId = c.get('userId');
-  const file = await (await c.req.blob()).text();
+  const body = await c.req.parseBody();
 
-  const { name, isLikes } = c.req.query();
+  const name = body.name as string | undefined;
+  const isLikes = body.isLikes ?? false;
+  const file = body.file as File | undefined;
+
+  if (!file) {
+    return c.json({ message: 'No file provided' }, 400);
+  }
 
   if (!name && !isLikes) {
     return c.json({ message: 'No playlist name provided' }, 400);
@@ -99,7 +112,7 @@ deezerController.post('/file', async (c) => {
     return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
-  const playlist = DeezerFileService.parseCsv(file);
+  const playlist = DeezerFileService.parseCsv(await file.text());
 
   if (!playlist) {
     return c.json({ message: 'No data found' }, 404);

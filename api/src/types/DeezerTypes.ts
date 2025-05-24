@@ -51,6 +51,7 @@ export type DeezerTracks = {
 };
 
 export type CreateSpotifyPlaylistBody = {
+  playlistUrl: string;
   name?: string;
   description?: string;
   public?: boolean;
