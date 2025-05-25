@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { HttpError } from 'simple-http-rest-client';
 import usePlumeTheme, { PlumeAdminThemeComponents } from '../hooks/ThemeHook';
 import DeezerExport from './DeezerExport';
+import scss from './home.module.scss';
 
 export default function Home() {
   const spotifyApi: SpotifyApi = getGlobalInstance(SpotifyApi);
@@ -50,7 +51,7 @@ export default function Home() {
   return (
     <Panel>
       <PanelTitle>{messages.home.title}</PanelTitle>
-      <div>
+      <div className={scss.home}>
         {
           loader.isLoading
             ? (

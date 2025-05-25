@@ -26,7 +26,7 @@ export default function InputText(
       label={label}
       type={type}
       name={name}
-      variant="filled"
+      variant="outlined"
       id={name}
       autoComplete={autoComplete}
       rules={rules}
