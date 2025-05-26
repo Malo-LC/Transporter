@@ -109,8 +109,9 @@ export function DeezerExport() {
           }
         >
           {
-            loader.isLoading || (transferProgress?.status === 'pending' || transferProgress?.status === 'transferring')
-              ? messages.deezer.exporting // Make sure this key exists
+            loader.isLoading
+            || (transferProgress?.status === 'pending' || transferProgress?.status === 'transferring')
+              ? messages.deezer.exporting
               : messages.deezer.export
           }
         </ActionButton>

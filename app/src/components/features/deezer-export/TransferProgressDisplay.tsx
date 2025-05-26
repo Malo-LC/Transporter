@@ -1,6 +1,6 @@
 import useMessages, { Messages } from '@i18n/hooks/messagesHook';
 import { LinearProgress } from '@mui/material';
-import scss from './deezer-export.module.scss';
+import scss from './transfer-progress.module.scss';
 import { ProgressData } from './useExportProgress';
 
 interface TransferProgressDisplayProps {
