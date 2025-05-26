@@ -49,6 +49,7 @@ export type Translations = {
     chooseExportMethod: string,
     description: string,
     export: string,
+    exporting: string,
     exportByFile: string,
     exportByPlaylistId: string,
     exportByUrl: string,

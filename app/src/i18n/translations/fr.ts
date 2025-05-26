@@ -52,6 +52,7 @@ const frMessages: Translations = {
     chooseExportMethod: 'Veuillez choisir une méthode d\'exportation',
     description: 'Si votre playlist contient plus de 2000 titres, il faut l\'exporter par fichier au format CSV grâce au site suivant :',
     export: 'Exporter',
+    exporting: 'Exportation en cours...',
     exportByFile: 'Exporter par fichier',
     exportByPlaylistId: 'Exporter par ID de playlist',
     exportByUrl: 'Sinon, vous pouvez entrer l\'url de votre playlist Deezer ci-dessous :',

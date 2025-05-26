@@ -52,6 +52,7 @@ const enMessages: Translations = {
     chooseExportMethod: 'Please choose an export method',
     description: 'If your playlist contains more than 2000 tracks, you need to export it by file in CSV format using the following site:',
     export: 'Export',
+    exporting: 'Exporting...',
     exportByFile: 'Export by file',
     exportByPlaylistId: 'Export by playlist ID',
     exportByUrl: 'Export by URL',

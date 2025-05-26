@@ -1,5 +1,5 @@
 import { DeezerStartExport } from '@api/deezer/data/DeezerApiTypes';
-import { FormValues } from '@components/features/DeezerExport';
+import { FormValues } from '@components/features/deezer-export/DeezerExport';
 import { HttpMethod } from 'simple-http-request-builder';
 import { HttpPromise } from 'simple-http-rest-client';
 import ApiHttpClient from '../ApiHttpClient';
@@ -30,10 +30,10 @@ export default class DeezerApi {
 
   // --- End Modified for WebSocket ---
 
-  exportByFile(data: FormValues) {
+  exportByFile(data: FormValues): HttpPromise<DeezerStartExport> {
     return this
       .httpClient
-      .multipartRequest<string>(HttpMethod.POST, '/deezer/file')
+      .multipartRequest<DeezerStartExport>(HttpMethod.POST, '/deezer/file')
       .data([['file', data.file], ['name', data.playlistName]])
       .execute();
   }
