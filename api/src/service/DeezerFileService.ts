@@ -14,22 +14,25 @@ export class DeezerFileService {
       return null; // Retourne null s'il n'y a pas de lignes de données
     }
 
-    let playlistName = dataLines[0].split(',')[3]?.trim().replaceAll('"', '') ?? '';
+    let playlistName = dataLines[0].split('","')[3]?.trim().replaceAll('"', '') ?? '';
 
     const tracks: TrackData[] = [];
 
     for (const dataLine of dataLines) {
-      const values = dataLine.split(',');
+      const values = dataLine
+        .slice(1)
+        .slice(0, -1) // Enlève les guillemets de début et de fin
+        .split('","');
 
-      if (values.length < 7) {
+      if (values.length !== 7) {
         console.warn(`Ligne CSV malformée ignorée : ${dataLine}`);
         continue; // Ignore cette ligne et passe à la suivante
       }
 
       const trackData: TrackData = {
-        trackName: values[0]?.trim().replaceAll('"', '') ?? '',
-        artistName: values[1]?.trim().replaceAll('"', '') ?? '',
-        albumName: values[2]?.trim().replaceAll('"', '') ?? '',
+        trackName: values[0]?.trim() ?? '',
+        artistName: values[1]?.trim() ?? '',
+        albumName: values[2]?.trim() ?? '',
       };
 
       // Ajouter la piste uniquement si elle a un nom

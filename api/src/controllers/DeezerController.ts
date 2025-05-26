@@ -31,7 +31,7 @@ deezerController.post('/playlists/to-spotify', async (c) => {
   const {
     name, description, public: isPublic, isLikes = false, playlistUrl
   } = await c.req.json<CreateSpotifyPlaylistBody>();
-  const regex = /(?:playlist\/|)(\d+)(?:[/?]|$)/m;
+  const regex = /(?:playlist\/|)(\d+)(?:[/?]|$)/m; // Regex to match Deezer playlist ID in the URL
   const match = playlistUrl?.match(regex);
   const playlistId = match ? match[1] : null;
 
