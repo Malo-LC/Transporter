@@ -11,10 +11,12 @@
     "@hono/node-server": "^1.14.1",
     "hono": "^4.7.9",
     "ky": "^1.8.1",
-    "tsx": "^4.19.4"
+    "tsx": "^4.19.4",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@types/node": "^22.15.18",
+    "@types/ws": "^8",
     "typescript": "^5.8.3"
   },
   "engines": {

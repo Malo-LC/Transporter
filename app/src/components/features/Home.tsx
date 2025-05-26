@@ -9,7 +9,7 @@ import { getGlobalInstance } from 'plume-ts-di';
 import { useState } from 'react';
 import { HttpError } from 'simple-http-rest-client';
 import usePlumeTheme, { PlumeAdminThemeComponents } from '../hooks/ThemeHook';
-import DeezerExport from './DeezerExport';
+import { DeezerExport } from './DeezerExport';
 import scss from './home.module.scss';
 
 export default function Home() {

@@ -1,13 +1,14 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
-import { logger } from 'hono/logger';
+import { WebSocket, WebSocketServer } from 'ws';
 import { NODE_ENV, PORT } from './config';
 import deezerController from './controllers/DeezerController';
 import spotifyController from './controllers/SpotifyController';
-
+// --- End WebSocket Server Imports ---
 const app = new Hono();
 
 if (NODE_ENV === 'development') {
@@ -34,7 +35,45 @@ app.route('/api/spotify', spotifyController);
 
 console.log(`Server is running on port ${PORT}`);
 
-serve({
+const server = serve({
   fetch: app.fetch,
   port: PORT,
+});
+
+export const wss = new WebSocketServer({ noServer: true });
+
+// --- WebSocket connection handling ---
+wss.on('connection', (ws: WebSocket, req) => {
+  const taskId = req.url?.split('/').pop();
+  if (taskId) {
+    // Attach the WebSocket to the specific task
+    deezerController.registerWebSocketForTask(taskId, ws);
+  } else {
+    console.warn('[WebSocket] Client connected without taskId in URL. Closing connection.');
+    ws.close(1008, 'No taskId provided'); // 1008: Policy Violation
+  }
+
+  ws.on('close', () => {
+    console.log(`[WebSocket] Client disconnected for taskId: ${taskId}`);
+    deezerController.unregisterWebSocketForTask(taskId, ws);
+  });
+
+  ws.on('error', (error) => {
+    console.error(`[WebSocket] Error for taskId ${taskId}:`, error);
+    deezerController.unregisterWebSocketForTask(taskId, ws); // Ensure cleanup on error
+  });
+});
+
+// --- Upgrade HTTP connections to WebSocket ---
+server.on('upgrade', (request, socket, head) => {
+  console.log(`[WebSocket] Upgrade request received for URL: ${request.url}`);
+  // Only upgrade if the URL matches our WebSocket path
+  if (request.url?.startsWith('/ws/export-progress/')) {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  } else {
+    // If not a WebSocket upgrade, let Hono handle it (or return 400 if unexpected)
+    socket.destroy();
+  }
 });

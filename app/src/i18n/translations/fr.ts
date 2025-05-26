@@ -57,10 +57,12 @@ const frMessages: Translations = {
     exportByUrl: 'Sinon, vous pouvez entrer l\'url de votre playlist Deezer ci-dessous :',
     exportSite: 'https://www.tunemymusic.com/fr/transfer',
     isLikes: 'Ajouter les titres à la playlist "J\'aime" ?',
+    openPlaylist: 'Ouvrir la playlist Spotify',
     playlistName: 'Nom de la playlist',
     playlistUrl: 'URL de la playlist Deezer',
-    title: 'Export Deezer vers Spotify',
+    missingTracks: 'Titres manquants dans la playlist Spotify :',
     success: 'Export Deezer vers Spotify réussi',
+    title: 'Export Deezer vers Spotify',
   },
   spotify: {
     error: (error: string) => `Erreur de connexion à Spotify : ${error}`,

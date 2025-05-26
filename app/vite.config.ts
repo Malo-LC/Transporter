@@ -22,7 +22,18 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': { // This handles HTTP requests to /api
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        // ... other options
+      },
+      // Add a separate entry for WebSocket specific path if needed,
+      // or let the existing /api route handle the upgrade if your WS path starts with /api
+      '/ws': { // Example: If your WS path was '/ws/export-progress'
+        target: 'ws://localhost:3000', // Use ws:// for the target
+        ws: true, // This is essential for WebSockets
+        changeOrigin: true,
+      },
     },
   },
   css: {

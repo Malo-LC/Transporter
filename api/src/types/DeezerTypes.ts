@@ -1,3 +1,5 @@
+import { WebSocket } from 'ws';
+
 export type DeezerTrack = {
   id: number;
   readable: boolean;
@@ -68,3 +70,15 @@ export type CsvFileData = {
   tracks: TrackData[];
   playlistName: string;
 }
+
+export type TaskProgress = {
+  status: 'pending' | 'transferring' | 'completed' | 'error';
+  percentage: number;
+  currentSong: number;
+  totalSongs: number;
+  spotifyPlaylistId?: string;
+  missingTracks?: string[];
+  timeTaken?: number;
+  songName?: string;
+  webSocketClients: WebSocket[];
+};

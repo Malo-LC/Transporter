@@ -57,10 +57,12 @@ const enMessages: Translations = {
     exportByUrl: 'Export by URL',
     exportSite: 'https://www.tunemymusic.com/en/transfer',
     isLikes: 'Should add to "Likes" playlist?',
+    openPlaylist: 'Open playlist',
     playlistName: 'Playlist name',
     playlistUrl: 'Deezer playlist URL',
-    title: 'Deezer',
     success: 'Deezer export successful',
+    missingTracks: 'Missing tracks in Spotify playlist:',
+    title: 'Deezer',
   },
   spotify: {
     error: (error: string) => `Spotify connection error: ${error}`,

@@ -44,6 +44,7 @@ export type Translations = {
     title: string,
   },
   deezer: {
+    missingTracks: string,
     success: string,
     chooseExportMethod: string,
     description: string,
@@ -55,6 +56,7 @@ export type Translations = {
     isLikes: string,
     playlistName: string,
     playlistUrl: string,
+    openPlaylist: string,
     title: string,
   },
   spotify: {

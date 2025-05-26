@@ -10,7 +10,8 @@ class DeezerService {
     userId: string,
     tracks: TrackData[],
     spotifyPlaylistId: string,
-    isLikes: boolean = false
+    isLikes: boolean = false,
+    callBackProgress?: (progress: number, songName: string) => void
   ): Promise<string[]> {
     const spotifyUris: string[] = [];
     const missingTracks: string[] = [];
@@ -44,9 +45,7 @@ class DeezerService {
       }
 
       // Log progress
-      if ((i + 1) % 10 === 0 || (i + 1) === tracks.length) {
-        console.info(`Processed ${((i + 1) / tracks.length * 100).toFixed(2)}% of tracks.`);
-      }
+      callBackProgress?.(i, `${track.trackName} - ${track.artistName}`);
     }
 
     // Add any remaining tracks
