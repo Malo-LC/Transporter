@@ -54,7 +54,6 @@ wss.on('connection', (ws: WebSocket, req) => {
   }
 
   ws.on('close', () => {
-    console.log(`[WebSocket] Client disconnected for taskId: ${taskId}`);
     deezerController.unregisterWebSocketForTask(taskId, ws);
   });
 
@@ -64,16 +63,13 @@ wss.on('connection', (ws: WebSocket, req) => {
   });
 });
 
-// --- Upgrade HTTP connections to WebSocket ---
 server.on('upgrade', (request, socket, head) => {
-  console.log(`[WebSocket] Upgrade request received for URL: ${request.url}`);
-  // Only upgrade if the URL matches our WebSocket path
   if (request.url?.startsWith('/ws/export-progress/')) {
+
     wss.handleUpgrade(request, socket, head, (ws) => {
       wss.emit('connection', ws, request);
     });
   } else {
-    // If not a WebSocket upgrade, let Hono handle it (or return 400 if unexpected)
     socket.destroy();
   }
 });

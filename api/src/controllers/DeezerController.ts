@@ -34,18 +34,22 @@ deezerController.use('*', async (c, next) => {
 
 // --- WebSocket Management Functions ---
 // Exported to be called from index.ts
-export const registerWebSocketForTask = (taskId: string, ws: WebSocket) => {
+const registerWebSocketForTask = (taskId: string, ws: WebSocket) => {
   let task = taskProgressStore.get(taskId);
+
   if (!task) {
     console.warn(`[WebSocket] Task ${taskId} not found when registering client.`);
+
     task = {
-      status: 'pending', percentage: 0, currentSong: 0, totalSongs: 0,
+      status: 'pending',
+      percentage: 0,
+      currentSong: 0,
+      totalSongs: 0,
       webSocketClients: []
     };
     taskProgressStore.set(taskId, task);
   }
   task.webSocketClients.push(ws);
-  console.log(`[WebSocket] Added WS client for task ${taskId}. Total clients: ${task.webSocketClients.length}`);
 
   // Send initial state immediately to new client if task already has progress
   if (task.status !== 'pending') {
@@ -53,11 +57,11 @@ export const registerWebSocketForTask = (taskId: string, ws: WebSocket) => {
   }
 };
 
-export const unregisterWebSocketForTask = (taskId: string, ws: WebSocket) => {
+const unregisterWebSocketForTask = (taskId: string, ws: WebSocket) => {
   const task = taskProgressStore.get(taskId);
+
   if (task) {
     task.webSocketClients = task.webSocketClients.filter(client => client !== ws);
-    console.log(`[WebSocket] Removed WS client for task ${taskId}. Total clients: ${task.webSocketClients.length}`);
   }
 };
 
@@ -67,6 +71,7 @@ const updateTaskProgress = (
   data: Partial<Omit<TaskProgress, 'webSocketClients'>>
 ) => {
   const task = taskProgressStore.get(taskId);
+
   if (task) {
     const updatedTask = { ...task, ...data };
     taskProgressStore.set(taskId, updatedTask);
