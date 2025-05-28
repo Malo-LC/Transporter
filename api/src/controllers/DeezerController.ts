@@ -8,6 +8,7 @@ import deezerService from '../service/DeezerService';
 import spotifyApiService from '../service/SpotifyApiService';
 import spotifyService from '../service/SpotifyService';
 import { CreateSpotifyPlaylistBody, DeezerTracks, TaskProgress, TrackData } from '../types/DeezerTypes';
+import deezerTaskProgressService from '../service/DeezerTaskProgressService';
 
 type Context = {
   userId: string | undefined;
@@ -32,72 +33,12 @@ deezerController.use('*', async (c, next) => {
   await next();
 });
 
-// --- WebSocket Management Functions ---
-// Exported to be called from index.ts
 const registerWebSocketForTask = (taskId: string, ws: WebSocket) => {
-  let task = taskProgressStore.get(taskId);
-
-  if (!task) {
-    console.warn(`[WebSocket] Task ${taskId} not found when registering client.`);
-
-    task = {
-      status: 'pending',
-      percentage: 0,
-      currentSong: 0,
-      totalSongs: 0,
-      webSocketClients: []
-    };
-    taskProgressStore.set(taskId, task);
-  }
-  task.webSocketClients.push(ws);
-
-  // Send initial state immediately to new client if task already has progress
-  if (task.status !== 'pending') {
-    ws.send(JSON.stringify(task));
-  }
+  deezerTaskProgressService.registerWebSocketForTask(taskId, ws);
 };
 
 const unregisterWebSocketForTask = (taskId: string, ws: WebSocket) => {
-  const task = taskProgressStore.get(taskId);
-
-  if (task) {
-    task.webSocketClients = task.webSocketClients.filter(client => client !== ws);
-  }
-};
-
-// --- Helper function to update task progress and notify WebSocket clients ---
-const updateTaskProgress = (
-  taskId: string,
-  data: Partial<Omit<TaskProgress, 'webSocketClients'>>
-) => {
-  const task = taskProgressStore.get(taskId);
-
-  if (task) {
-    const updatedTask = { ...task, ...data };
-    taskProgressStore.set(taskId, updatedTask);
-
-    // Send update to all active WebSocket clients for this task
-    task.webSocketClients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) { // Only send if connection is open
-        try {
-          client.send(JSON.stringify(updatedTask));
-          console.log(`[WebSocket] Sent update for task ${taskId} to client.`);
-        } catch (sendError) {
-          console.error(`[WebSocket] Error sending message to client for task ${taskId}:`, sendError);
-        }
-      }
-    });
-
-    // If task is completed or errors, close WebSocket connections for this task
-    if (updatedTask.status === 'completed' || updatedTask.status === 'error') {
-      task.webSocketClients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.close(1000, 'Task completed'); // 1000: Normal Closure
-        }
-      });
-      task.webSocketClients = []; // Clear clients after closing
-    }
-  }
+  deezerTaskProgressService.unregisterWebSocketForTask(taskId, ws);
 };
 
 // Expose these functions via the controller object for index.ts
@@ -136,21 +77,20 @@ deezerController.post('/start-playlist-export', async (c) => {
 
   const taskId = `transfer-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-  taskProgressStore.set(taskId, {
+  deezerTaskProgressService.setTask(taskId, {
     status: 'pending',
     percentage: 0,
     currentSong: 0,
     totalSongs: 0,
-    webSocketClients: [], // Initialize with empty client list
+    webSocketClients: [],
   });
 
-  // Detach the background task for Node.js
   (async () => {
     try {
       const deezerPlaylistTracks: DeezerTracks = await deezerApiService.fetchPlaylist(playlistId);
 
       if (!deezerPlaylistTracks.data || deezerPlaylistTracks.data.length === 0) {
-        updateTaskProgress(taskId, { status: 'error' });
+        deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });
         return;
       }
 
@@ -160,17 +100,17 @@ deezerController.post('/start-playlist-export', async (c) => {
         albumName: track.album.title,
       }));
 
-      updateTaskProgress(taskId, {
+      deezerTaskProgressService.updateTaskProgress(taskId, {
         totalSongs: deezerTracks.length,
       });
 
       const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(userId, name, isLikes, description, isPublic);
 
       if (!spotifyPlaylistId) {
-        updateTaskProgress(taskId, { status: 'error' });
+        deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });
         return;
       }
-      updateTaskProgress(taskId, {
+      deezerTaskProgressService.updateTaskProgress(taskId, {
         spotifyPlaylistId,
       });
 
@@ -182,7 +122,7 @@ deezerController.post('/start-playlist-export', async (c) => {
         (currentProgress: number, songName: string) => {
           const total = deezerTracks.length;
           const percentage = Math.round((currentProgress / total) * 100);
-          updateTaskProgress(taskId, {
+          deezerTaskProgressService.updateTaskProgress(taskId, {
             status: 'transferring',
             currentSong: currentProgress,
             totalSongs: total,
@@ -192,9 +132,7 @@ deezerController.post('/start-playlist-export', async (c) => {
         }
       );
 
-      console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
-
-      updateTaskProgress(taskId, {
+      deezerTaskProgressService.updateTaskProgress(taskId, {
         status: 'completed',
         percentage: 100,
         spotifyPlaylistId: spotifyPlaylistId,
@@ -204,13 +142,12 @@ deezerController.post('/start-playlist-export', async (c) => {
 
     } catch (error) {
       console.error(`Error during playlist transfer for task ${taskId}:`, error);
-      updateTaskProgress(taskId, {
+      deezerTaskProgressService.updateTaskProgress(taskId, {
         status: 'error',
       });
     } finally {
       setTimeout(() => {
-        taskProgressStore.delete(taskId);
-        console.log(`Task ${taskId} removed from store.`);
+        deezerTaskProgressService.deleteTask(taskId);
       }, 5 * 60 * 1000);
     }
   })()
@@ -225,7 +162,8 @@ deezerController.post('/file', async (c) => {
   const body = await c.req.parseBody();
 
   const name = body.name as string | undefined;
-  const isLikes = body.isLikes ?? false;
+  const isLikesValue = body.isLikes;
+  const isLikes = typeof isLikesValue === 'string' ? isLikesValue.toLowerCase() === 'true' : !!isLikesValue;
   const file = body.file as File | undefined;
 
   if (!file) {
@@ -244,32 +182,80 @@ deezerController.post('/file', async (c) => {
     return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
-  const playlist = DeezerFileService.parseCsv(await file.text());
+  const taskId = `file-transfer-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-  if (!playlist) {
-    return c.json({ message: 'No data found' }, 404);
-  }
+  deezerTaskProgressService.setTask(taskId, {
+    status: 'pending',
+    percentage: 0,
+    currentSong: 0,
+    totalSongs: 0,
+    webSocketClients: [],
+  });
 
-  console.info('Fetched deezer playlist ', playlist.playlistName, ' with ', playlist.tracks.length, ' tracks');
+  (async () => {
+    try {
+      const playlist = DeezerFileService.parseCsv(await file.text());
 
-  const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(userId, name, !!isLikes);
+      if (!playlist || playlist.tracks.length === 0) {
+        deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });
+        return;
+      }
 
-  if (!spotifyPlaylistId) {
-    return c.json({ message: 'Failed to create or find Spotify playlist' }, 500);
-  }
+      console.info('Fetched deezer playlist ', playlist.playlistName, ' with ', playlist.tracks.length, ' tracks for task', taskId);
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        totalSongs: playlist.tracks.length,
+      });
 
-  const missingTracks = await deezerService.transferTracksToSpotify(userId, playlist.tracks, spotifyPlaylistId, !!isLikes);
+      const spotifyPlaylistId = await spotifyService.createOrGetSpotifyPlaylist(userId, name, !!isLikes);
 
-  console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}".`);
+      if (!spotifyPlaylistId) {
+        deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });
+        return;
+      }
+      deezerTaskProgressService.updateTaskProgress(taskId, { spotifyPlaylistId });
 
-  return c.json({
-      message: 'Playlist transferred successfully',
-      spotifyPlaylistId,
-      time: ((performance.now() - t0) / 1000).toFixed(2) + ' seconds',
-      missingTracks,
-    },
-    200
-  );
+      const missingTracks = await deezerService.transferTracksToSpotify(
+        userId,
+        playlist.tracks,
+        spotifyPlaylistId,
+        !!isLikes,
+        (currentProgress: number, songName: string) => {
+          const total = playlist.tracks.length;
+          const percentage = Math.round((currentProgress / total) * 100);
+          deezerTaskProgressService.updateTaskProgress(taskId, {
+            status: 'transferring',
+            currentSong: currentProgress,
+            totalSongs: total,
+            percentage: percentage,
+            songName
+          });
+        }
+      );
+
+      console.info(`Successfully added all tracks to Spotify playlist "${spotifyPlaylistId}" for task ${taskId}.`);
+
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        status: 'completed',
+        percentage: 100,
+        spotifyPlaylistId: spotifyPlaylistId,
+        timeTaken: (performance.now() - t0),
+        missingTracks,
+      });
+
+    } catch (error) {
+      console.error(`Error during file playlist processing for task ${taskId}:`, error);
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        status: 'error',
+      });
+    } finally {
+      setTimeout(() => {
+        deezerTaskProgressService.deleteTask(taskId);
+        console.log(`Task ${taskId} (file processing) removed from store.`);
+      }, 5 * 60 * 1000);
+    }
+  })().then(r => r);
+
+  return c.json({ taskId }, 200);
 });
 
 export default deezerController;

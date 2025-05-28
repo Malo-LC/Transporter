@@ -26,7 +26,6 @@ export default function Home() {
   const loginToSpotify = async () => {
     spotifyApi.login()
       .then((url: string) => {
-        console.log('Redirecting to Spotify login page:', url);
         window.location.href = url;
       })
       .catch(notifyHttpError);

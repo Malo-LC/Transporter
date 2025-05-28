@@ -12,16 +12,12 @@ const spotifyController = new Hono<{ Variables: Context }>();
 spotifyController.use('/me', async (c, next) => {
   const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, 'userId');
 
-  console.log('User ID from cookie:', userId);
-
   c.set('userId', userId || undefined); // NOSONARR
   await next();
 });
 
 spotifyController.get('/me', (c) => {
   const userId = c.get('userId');
-
-  console.log('User ID:', userId);
 
   if (!userId) {
     deleteCookie(c, 'userId');
