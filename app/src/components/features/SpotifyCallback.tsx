@@ -1,5 +1,5 @@
 import SpotifyApi from '@api/spotify/SpotifyApi';
-import { Panel } from '@components/theme/panel/Panel';
+import Panel from '@components/theme/panel/Panel';
 import useMessages from '@i18n/hooks/messagesHook';
 import useLoader, { LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
 import useNotification from '@lib/plume-notification/NotificationHook';

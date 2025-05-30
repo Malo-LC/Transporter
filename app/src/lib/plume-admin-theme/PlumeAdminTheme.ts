@@ -12,28 +12,13 @@ import { FieldValues } from 'react-hook-form';
 import { ActionButtonProps, ActionContainerProps, ActionLinkProps } from './action/ActionProps';
 import { FormFieldProps } from './form/FormFieldProps';
 import { InputPasswordProps, InputSelectProps, InputTextProps } from './form/FormInputProps';
-import {
-  PanelContentElementColumnProps,
-  PanelContentElementProps,
-  PanelProps,
-  PanelTitleProps,
-} from './panel/PanelProps';
+import { PanelProps } from './panel/PanelProps';
 import { ConfirmationPopInProps, PopinProps } from './popin/PopinProps';
 
 export default abstract class PlumeAdminTheme {
   // layout
 
   abstract panel: (props: PanelProps) => ReactNode;
-
-  abstract panelSeparator: () => ReactNode;
-
-  abstract panelTitle: (props: PanelTitleProps) => ReactNode;
-
-  abstract panelContent: (props: PanelProps) => ReactNode;
-
-  abstract panelContentElement: (props: PanelContentElementProps) => ReactNode;
-
-  abstract panelContentElementColumn: (props: PanelContentElementColumnProps) => ReactNode;
 
   // lists
 

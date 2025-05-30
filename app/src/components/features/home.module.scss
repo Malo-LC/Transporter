@@ -1,6 +1,10 @@
 .home {
   display: flex;
   flex-direction: column;
-  gap: $spacer-4;
+  gap: $spacer-6;
   padding: $spacer-4;
+
+  &_connected {
+    color: $green-success;
+  }
 }

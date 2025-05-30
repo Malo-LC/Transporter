@@ -46,6 +46,7 @@ const enMessages: Translations = {
   // home
   home: {
     title: 'Home page',
+    description: 'Welcome to the home page of the Deezer to Spotify playlist transfer application.',
     loginToSpotify: 'Log in to Spotify',
   },
   deezer: {

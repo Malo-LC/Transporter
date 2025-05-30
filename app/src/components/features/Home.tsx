@@ -18,7 +18,7 @@ export default function Home() {
   const { messages }: Messages = useMessages();
   const { notifyHttpError } = useNotification();
   const loader: LoaderState = useLoader();
-  const { panel: Panel, panelTitle: PanelTitle, actionButton: Button }: PlumeAdminThemeComponents = usePlumeTheme();
+  const { panel: Panel, actionButton: Button }: PlumeAdminThemeComponents = usePlumeTheme();
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userId, setUserId] = useState<string | undefined>(undefined);
@@ -49,7 +49,6 @@ export default function Home() {
 
   return (
     <Panel>
-      <PanelTitle>{messages.home.title}</PanelTitle>
       <div className={scss.home}>
         {
           loader.isLoading
@@ -57,19 +56,27 @@ export default function Home() {
               <CircularProgress />
             )
             : (
-              <div>
+              <>
                 {
                   isAuthenticated
                     ? (
-                      <p>{messages.spotify.connectedAs(userId)}</p>
+                      <p className={scss.homeConnected}>{messages.spotify.connectedAs(userId)}</p>
                     )
                     : (
-                      <Button onClick={loginToSpotify}>
-                        {messages.home.loginToSpotify}
-                      </Button>
+                      <>
+                        <h1>
+                          {messages.home.title}
+                        </h1>
+                        <div>
+                          {messages.home.description}
+                        </div>
+                        <Button onClick={loginToSpotify}>
+                          {messages.home.loginToSpotify}
+                        </Button>
+                      </>
                     )
                 }
-              </div>
+              </>
             )
         }
         {

@@ -8,7 +8,7 @@ import useLoader, { LoaderState } from '@lib/plume-http-react-hook-loader/promis
 import useNotification from '@lib/plume-notification/NotificationHook';
 import { Checkbox } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { FieldError, useForm, UseFormReturn } from 'react-hook-form';
 import { FormContainer } from 'react-hook-form-mui';
 import CustomFileInput from '../../theme/form/fields/CustomFileInput';
 import scss from './deezer-export.module.scss';

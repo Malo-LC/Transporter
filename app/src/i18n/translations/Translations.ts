@@ -40,6 +40,7 @@ export type Translations = {
   },
   // home
   home: {
+    description: string,
     loginToSpotify: string,
     title: string,
   },
