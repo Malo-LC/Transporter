@@ -8,7 +8,6 @@ import initializeLocalizedDate from '@i18n/messages/LocalizedDate';
 import 'react-toastify/dist/ReactToastify.css';
 import 'micro-observables/batchingForReactDom';
 import installServicesModule from '@services/services-module';
-import SessionService from '@services/session/SessionService';
 import { configureGlobalInjector, Injector } from 'plume-ts-di';
 import './polyfill-loader';
 import { JSX } from 'react';
@@ -27,10 +26,6 @@ installI18nModule(injector);
 injector.initializeSingletonInstances();
 
 configureGlobalInjector(injector);
-
-const sessionService: SessionService = injector.getInstance(SessionService);
-sessionService.tryInitializingSessionFromStorage();
-sessionService.synchronizeSessionFromOtherBrowserTags();
 
 // dayjs
 initializeLocalizedDate(injector.getInstance(LocaleService));

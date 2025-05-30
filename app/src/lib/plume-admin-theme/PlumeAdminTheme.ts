@@ -1,12 +1,5 @@
 import { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
 import { ListHeadProps, ListItemProps, ListProps } from '@lib/plume-admin-theme/list/ListProps';
-import {
-  FilterContainerProps,
-  FilterGroupProps,
-  FilterInputSearchProps,
-  FilterMenuProps,
-} from '@lib/plume-search/filters/FilterTypes';
-import { SortSelectProps } from '@lib/plume-search/sorts/SortTypes';
 import { ReactNode } from 'react';
 import { FieldValues } from 'react-hook-form';
 import { ActionButtonProps, ActionContainerProps, ActionLinkProps } from './action/ActionProps';
@@ -55,18 +48,4 @@ export default abstract class PlumeAdminTheme {
   abstract inputSelect: (props: InputSelectProps) => ReactNode;
 
   abstract inputPassword: (props: InputPasswordProps) => ReactNode;
-
-  // filters
-
-  abstract filterMenu: (props: FilterMenuProps) => ReactNode;
-
-  abstract filter: (props: FilterContainerProps) => ReactNode;
-
-  abstract filterGroup: (props: FilterGroupProps) => ReactNode;
-
-  abstract filterInputSearch: (props: FilterInputSearchProps) => ReactNode;
-
-  // sort
-
-  abstract sortSelect: <S extends string>(props: SortSelectProps<S>) => ReactNode;
 }
