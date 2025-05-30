@@ -1,5 +1,5 @@
 import classNames from '@lib/class-names/ClassNames';
-import { PanelProps, } from '@lib/plume-admin-theme/panel/PanelProps';
+import { PanelProps } from '@lib/plume-admin-theme/panel/PanelProps';
 import React from 'react';
 
 import scss from './panel.module.scss';
