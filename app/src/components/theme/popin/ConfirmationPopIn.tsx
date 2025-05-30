@@ -1,5 +1,5 @@
 import ActionStyle from '@lib/plume-admin-theme/action/ActionStyle';
-import { ConfirmationPopInProps, } from '@lib/plume-admin-theme/popin/PopinProps';
+import { ConfirmationPopInProps } from '@lib/plume-admin-theme/popin/PopinProps';
 import { ActionButton, ActionsContainer } from '../action/Actions';
 import Popin from './Popin';
 

@@ -61,8 +61,10 @@ const frMessages: Translations = {
     openPlaylist: 'Ouvrir la playlist Spotify',
     playlistName: 'Nom de la playlist',
     playlistUrl: 'URL de la playlist Deezer',
+    playlistUrlInvalid: 'URL de la playlist Deezer invalide, elle doit être de la forme https://www.deezer.com/playlist/1234567890',
     success: 'Export Deezer vers Spotify réussi',
     title: 'Export Deezer vers Spotify',
+    transferError: 'Erreur lors de la transmission des titres vers Spotify',
   },
   spotify: {
     error: (error: string) => `Erreur de connexion à Spotify : ${error}`,
@@ -135,6 +137,15 @@ const frMessages: Translations = {
     TOO_MANY_WRONG_ATTEMPS: (seconds: string) => `Suite à des erreurs dans la saisie de vos identifiants, votre compte est verrouillé pendant ${seconds} secondes, veuillez-vous reconnecter ultérieurement`,
     FIELD_REQUIRED: (fieldName: string) => `Le champ '${fieldName}' est requis`,
     MESSAGE: (message: string) => message,
+    UNAUTHORIZED: 'Non autorisé',
+    BAD_REQUEST: 'Requête invalide',
+    NOT_FOUND: 'Ressource non trouvée',
+    DEEZER_PLAYLIST_NOT_FOUND: 'Playlist Deezer non trouvée',
+    DEEZER_PLAYLIST_PARSING_ERROR: 'Erreur lors de la lecture de la playlist Deezer',
+    DEEZER_PLAYLIST_URL_INVALID: 'URL de la playlist Deezer invalide',
+    DEEZER_PLAYLIST_NAME_MISSING: 'Le nom de la playlist Deezer est requis',
+    SPOTIFY_ACCESS_TOKEN_MISSING: 'L\'accès à Spotify est requis',
+    SPOTIFY_PLAYLIST_CREATION_ERROR: 'Erreur lors de la création de la playlist Spotify',
   },
 } as const;
 

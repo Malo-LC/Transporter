@@ -61,8 +61,10 @@ const enMessages: Translations = {
     openPlaylist: 'Open playlist',
     playlistName: 'Playlist name',
     playlistUrl: 'Deezer playlist URL',
+    playlistUrlInvalid: 'Invalid Deezer playlist URL, it should be like https://www.deezer.com/playlist/1234567890',
     success: 'Deezer export successful',
     title: 'Deezer',
+    transferError: 'Error transferring tracks to Spotify',
   },
   spotify: {
     error: (error: string) => `Spotify connection error: ${error}`,
@@ -135,6 +137,15 @@ const enMessages: Translations = {
     TOO_MANY_WRONG_ATTEMPS: (seconds: string) => `Due to login attempt errors, your account is locked for ${seconds} seconds, please try again later`,
     FIELD_REQUIRED: (fieldName: string) => `Field '${fieldName}' is required`,
     MESSAGE: (message: string) => message,
+    UNAUTHORIZED: 'Unauthorized',
+    BAD_REQUEST: 'Bad request',
+    NOT_FOUND: 'Resource not found',
+    DEEZER_PLAYLIST_NOT_FOUND: 'Deezer playlist not found',
+    DEEZER_PLAYLIST_PARSING_ERROR: 'Deezer playlist parsing error',
+    DEEZER_PLAYLIST_URL_INVALID: 'Deezer playlist URL invalid',
+    DEEZER_PLAYLIST_NAME_MISSING: 'Deezer playlist name missing',
+    SPOTIFY_ACCESS_TOKEN_MISSING: 'Spotify access token missing',
+    SPOTIFY_PLAYLIST_CREATION_ERROR: 'Spotify playlist creation error',
   },
 } as const;
 

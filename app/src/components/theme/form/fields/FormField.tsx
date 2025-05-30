@@ -1,7 +1,7 @@
 import useFormErrorParser from '@components/theme/form/hooks/FormErrorParserHook';
 import { FormFieldProps } from '@lib/plume-admin-theme/form/FormFieldProps';
 import { FormControl, FormHelperText } from '@mui/material';
-import { FieldError, FieldValues, get, useFormState, UseFormStateReturn, } from 'react-hook-form';
+import { FieldError, FieldValues, get, useFormState, UseFormStateReturn } from 'react-hook-form';
 
 import scss from './form-input.module.scss';
 

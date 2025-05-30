@@ -9,7 +9,8 @@ import { Translations } from '../translations/Translations';
 export default class MessageService {
   private readonly messages: Observable<Translations>;
 
-  private static translations: Map<Locale, Observable<Translations>> = new Map<Locale, Observable<Translations>>([
+  // eslint-disable-next-line @stylistic/max-len
+  private static readonly translations: Map<Locale, Observable<Translations>> = new Map<Locale, Observable<Translations>>([
     [LocaleService.LOCALE_FR, frMessages],
     [LocaleService.LOCALE_EN, enMessages],
   ]);

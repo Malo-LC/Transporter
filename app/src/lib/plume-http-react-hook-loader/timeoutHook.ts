@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
 
 /**
  * Enable to control the timeout in the component where it is used.

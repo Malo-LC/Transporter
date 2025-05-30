@@ -1,7 +1,7 @@
 import useMessages, { Messages } from '@i18n/hooks/messagesHook';
 import classNames from '@lib/class-names/ClassNames';
 import { FilterInputSearchProps } from '@lib/plume-search/filters/FilterTypes';
-import { Button, Icon, IconButton, InputAdornment, Popover, TextField, } from '@mui/material';
+import { Button, Icon, IconButton, InputAdornment, Popover, TextField } from '@mui/material';
 import { RefObject, useRef, useState } from 'react';
 
 import scss from './filter-input-search.module.scss';

@@ -1,4 +1,7 @@
+import { TrackData } from '../types/DeezerTypes';
 import spotifyApiService from './SpotifyApiService';
+import deezerTaskProgressService from '../service/DeezerTaskProgressService';
+import deezerService from './DeezerService';
 
 class SpotifyService {
   /**
@@ -36,6 +39,68 @@ class SpotifyService {
     }
     return null;
   }
+
+  public async processPlaylistTransfer(
+    taskId: string,
+    userId: string,
+    name: string | undefined,
+    isLikes: boolean,
+    description: string | undefined,
+    isPublic: boolean,
+    deezerTracks: TrackData[],
+    t0: number
+  ) {
+    try {
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        totalSongs: deezerTracks.length,
+      });
+
+      const spotifyPlaylistId = await this.createOrGetSpotifyPlaylist(userId, name, isLikes, description, isPublic);
+
+      if (!spotifyPlaylistId) {
+        deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });
+        return;
+      }
+      deezerTaskProgressService.updateTaskProgress(taskId, { spotifyPlaylistId });
+
+      const missingTracks = await deezerService.transferTracksToSpotify(
+        userId,
+        deezerTracks,
+        spotifyPlaylistId,
+        isLikes,
+        (currentProgress: number, songName: string) => {
+          const total = deezerTracks.length;
+          const percentage = Math.round((currentProgress / total) * 100);
+          deezerTaskProgressService.updateTaskProgress(taskId, {
+            status: 'transferring',
+            currentSong: currentProgress,
+            totalSongs: total,
+            percentage: percentage,
+            songName
+          });
+        }
+      );
+
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        status: 'completed',
+        percentage: 100,
+        spotifyPlaylistId: spotifyPlaylistId,
+        timeTaken: (performance.now() - t0),
+        missingTracks,
+      });
+
+    } catch (error) {
+      console.error(`Error during playlist processing for task ${taskId}:`, error);
+      deezerTaskProgressService.updateTaskProgress(taskId, {
+        status: 'error',
+      });
+    } finally {
+      setTimeout(() => {
+        deezerTaskProgressService.deleteTask(taskId);
+      }, 5 * 60 * 1000);
+    }
+  }
+
 }
 
 const spotifyService = new SpotifyService();

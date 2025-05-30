@@ -3,6 +3,7 @@ import useMessages, { Messages } from '@i18n/hooks/messagesHook';
 import useNotification from '@lib/plume-notification/NotificationHook';
 import { getGlobalInstance } from 'plume-ts-di';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { Logger } from 'simple-logging-system';
 
 export type ProgressData = {
   status: 'pending' | 'transferring' | 'completed' | 'error',
@@ -14,6 +15,7 @@ export type ProgressData = {
   missingTracks?: string[],
   timeTaken?: string,
 };
+const logger: Logger = new Logger('useExportProgress');
 
 export function useExportProgress() {
   const deezerApi: DeezerApi = getGlobalInstance(DeezerApi);
@@ -66,20 +68,15 @@ export function useExportProgress() {
         setTransferProgress(progressData);
 
         if (progressData.status === 'completed') {
-          if (progressData.spotifyPlaylistId) {
-            // TODO: Use a more specific error message if available
-            notifySuccess(`${messages.deezer.success} New playlist ID: ${progressData.spotifyPlaylistId}`);
-          } else {
-            notifySuccess(messages.deezer.success);
-          }
+          notifySuccess(messages.deezer.success);
           closeWebSocket(1000, 'Transfer completed by server');
         } else if (progressData.status === 'error') {
-          notifyError('messages.deezer.transferError'); // TODO: Use a more specific error message if available
+          notifyError(messages.deezer.transferError);
           closeWebSocket(1000, 'Transfer failed by server');
         }
       } catch (error) {
-        console.error('[WebSocket] Error parsing message data:', error);
-        notifyError('messages.deezer.transferError'); // TODO: Use a more specific error message if available
+        logger.error('[WebSocket] Error parsing message data:', error);
+        notifyError(messages.deezer.transferError);
         setTransferProgress({
           status: 'error',
           percentage: 0,
@@ -91,8 +88,8 @@ export function useExportProgress() {
     };
 
     ws.onerror = (errorEvent: Event) => {
-      console.error('[WebSocket] Error:', errorEvent);
-      notifyError('messages.deezer.transferError'); // TODO: Use a more specific error message if available
+      logger.error('[WebSocket] Error:', errorEvent);
+      notifyError(messages.deezer.transferError);
       setTransferProgress({
         status: 'error',
         percentage: 0,

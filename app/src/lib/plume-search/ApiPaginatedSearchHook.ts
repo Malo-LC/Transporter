@@ -1,5 +1,5 @@
 import useNotification, { PlumeNotification } from '@lib/plume-notification/NotificationHook';
-import { Page, PaginatedSearch, PaginationParamsType, PaginationType, } from '@lib/plume-search/SearchTypes';
+import { Page, PaginatedSearch, PaginationParamsType, PaginationType } from '@lib/plume-search/SearchTypes';
 import { SortOption } from '@lib/plume-search/sorts/SortTypes';
 import { useEffect, useState } from 'react';
 import { HttpPromise } from 'simple-http-rest-client';

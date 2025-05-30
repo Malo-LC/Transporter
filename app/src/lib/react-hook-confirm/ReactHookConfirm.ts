@@ -1,5 +1,5 @@
 import useMessages from '@i18n/hooks/messagesHook';
-import { ConfirmationPopInProps, } from '@lib/plume-admin-theme/popin/PopinProps';
+import { ConfirmationPopInProps } from '@lib/plume-admin-theme/popin/PopinProps';
 import { useCallback, useState } from 'react';
 
 export type ConfirmationPopInOptions = {

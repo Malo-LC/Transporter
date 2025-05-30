@@ -1,5 +1,5 @@
 import useFormErrorParser from '@components/theme/form/hooks/FormErrorParserHook';
-import { InputSelectProps, } from '@lib/plume-admin-theme/form/FormInputProps';
+import { InputSelectProps } from '@lib/plume-admin-theme/form/FormInputProps';
 import { SelectElement } from 'react-hook-form-mui';
 
 import scss from './form-input.module.scss';

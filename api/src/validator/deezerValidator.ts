@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import { CreateSpotifyPlaylistBody } from '../types/DeezerTypes';
 import spotifyApiService from '../service/SpotifyApiService';
+import { ErrorCodesEnum } from '../types/GlobalTypes';
 
 export async function validateDeezerPlaylistExport<T, U extends Context>(_value: T, c: U) {
   const userId: string = c.get('userId');
@@ -10,7 +11,7 @@ export async function validateDeezerPlaylistExport<T, U extends Context>(_value:
   } = await c.req.json<CreateSpotifyPlaylistBody>();
 
   if (!playlistUrl) {
-    return c.json({ message: 'No playlist URL provided' }, 400);
+    return c.json({ errorCode: ErrorCodesEnum.BAD_REQUEST }, 400);
   }
 
   const regex = /(?:playlist\/|)(\d+)(?:[/?]|$)/m;
@@ -18,19 +19,19 @@ export async function validateDeezerPlaylistExport<T, U extends Context>(_value:
   const playlistId = match ? match[1] : null;
 
   if (!playlistId) {
-    return c.json({ message: 'Invalid Deezer playlist URL' }, 400);
+    return c.json({ errorCode: ErrorCodesEnum.DEEZER_PLAYLIST_URL_INVALID }, 400);
   }
 
   if (!name && !isLikes) {
-    return c.json({ message: 'No playlist name provided' }, 400);
+    return c.json({ errorCode: ErrorCodesEnum.DEEZER_PLAYLIST_NAME_MISSING }, 400);
   }
 
   if (!userId) {
-    return c.json({ message: 'User ID is missing' }, 401);
+    return c.json({ errorCode: ErrorCodesEnum.UNAUTHORIZED }, 401);
   }
 
   if (!spotifyApiService.hasAccessToken(userId)) {
-    return c.json({ message: 'Spotify access token is missing' }, 401);
+    return c.json({ errorCode: ErrorCodesEnum.SPOTIFY_ACCESS_TOKEN_MISSING }, 401);
   }
 
   return {

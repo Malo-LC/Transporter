@@ -47,6 +47,10 @@ export function DeezerExport() {
     closeWebSocket();
 
     if (file) {
+      // Prevent refresh of the page when the file is uploaded
+      window.onbeforeunload = () => {
+        return 'Are you sure you want to leave this page?';
+      };
       loader.monitor(
         deezerApi
           .exportByFile(data)
@@ -56,6 +60,10 @@ export function DeezerExport() {
           .catch(notifyHttpError),
       );
     } else if (playlistUrl) {
+      // Prevent refresh of the page when the playlist URL is entered
+      window.onbeforeunload = () => {
+        return 'Are you sure you want to leave this page?';
+      };
       loader.monitor(
         deezerApi
           .exportByPlaylistId(data)
@@ -87,6 +95,20 @@ export function DeezerExport() {
           name="playlistUrl"
           label={messages.deezer.playlistUrl}
           disabled={!!formContext.watch('file')}
+          rules={{
+            validate: (value: string) => {
+              if ((value ?? '').includes('dzr.page.link')) {
+                return messages.deezer.playlistUrlInvalid;
+              }
+              return true;
+            },
+          }}
+          errorMessageMapping={(error: FieldError) => {
+            if (error.message === messages.deezer.playlistUrlInvalid) {
+              return messages.deezer.playlistUrlInvalid;
+            }
+            return undefined;
+          }}
         />
         <InputText
           name="playlistName"

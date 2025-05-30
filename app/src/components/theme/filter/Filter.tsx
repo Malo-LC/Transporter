@@ -8,10 +8,10 @@ import { getGlobalInstance } from 'plume-ts-di';
 import scss from './filter-menu.module.scss';
 
 export default function Filter({
-    messageKey,
-    info,
-    children,
-  }: Readonly<FilterContainerProps>,
+  messageKey,
+  info,
+  children,
+}: Readonly<FilterContainerProps>,
 ) {
   const messages: PlumeMessageResolver = useMessagesResolver(getGlobalInstance(PlumeMessageResolverService));
   return (

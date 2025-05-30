@@ -1,5 +1,5 @@
 import useToggle from '@lib/react-hook-toggle/ReactHookToggle';
-import { Collapse, Icon, List, ListItem, ListItemIcon, ListItemText, } from '@mui/material';
+import { Collapse, Icon, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ReactNode } from 'react';
 import { IconType } from '../theme/IconType';
 

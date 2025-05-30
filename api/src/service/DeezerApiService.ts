@@ -1,14 +1,12 @@
 import ky, { KyInstance } from 'ky';
 import { DeezerTracks } from '../types/DeezerTypes';
 
-export class DeezerApiService {
-  private readonly url: string;
+class DeezerApiService {
   private readonly client: KyInstance;
 
   constructor() {
-    this.url = 'https://api.deezer.com/';
     this.client = ky.create({
-      prefixUrl: this.url,
+      prefixUrl: 'https://api.deezer.com/',
       searchParams: {
         output: 'json',
         limit: 2000,
@@ -21,4 +19,5 @@ export class DeezerApiService {
   }
 }
 
-
+const deezerApiService = new DeezerApiService();
+export default deezerApiService;

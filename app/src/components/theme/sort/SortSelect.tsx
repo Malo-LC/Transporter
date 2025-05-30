@@ -2,7 +2,7 @@ import PlumeMessageResolver from '@lib/plume-messages/MessageResolver';
 import PlumeMessageResolverService from '@lib/plume-messages/MessageResolverService';
 import useMessagesResolver from '@lib/plume-messages/messagesResolveHook';
 import { SortOption, SortSelectProps } from '@lib/plume-search/sorts/SortTypes';
-import { Icon, ListItemText, MenuItem, Select, SelectChangeEvent, } from '@mui/material';
+import { Icon, ListItemText, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useMemo } from 'react';
 

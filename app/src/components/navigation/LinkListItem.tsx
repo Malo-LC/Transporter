@@ -1,7 +1,7 @@
 import classNames from '@lib/class-names/ClassNames';
-import { Icon, ListItemButton, ListItemIcon, ListItemText, } from '@mui/material';
+import { Icon, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { createGroup } from 'type-route';
-import { DeclaredRoutePaths, routes, UseRoute, useRoute, } from '../../router/RouterDefinition';
+import { DeclaredRoutePaths, routes, UseRoute, useRoute } from '../../router/RouterDefinition';
 import { IconType } from '../theme/IconType';
 
 import scss from './navigation.module.scss';

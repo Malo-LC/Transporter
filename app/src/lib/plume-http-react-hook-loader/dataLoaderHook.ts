@@ -1,4 +1,4 @@
-import { DependencyList, RefObject, useEffect, useRef, useState, } from 'react';
+import { DependencyList, RefObject, useEffect, useRef, useState } from 'react';
 import { DataLoader } from './observableLoaderHook';
 import useLoader, { LoaderState, LoadingPromise } from './promiseLoaderHook';
 

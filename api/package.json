@@ -5,7 +5,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx --watch --env-file=.env src/index.ts"
+    "dev": "tsx --watch --env-file=.env src/index.ts",
+    "typescript": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",

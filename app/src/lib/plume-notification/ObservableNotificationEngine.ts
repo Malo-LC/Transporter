@@ -1,6 +1,6 @@
 import { observable, WritableObservable } from 'micro-observables';
 import { Logger } from 'simple-logging-system';
-import NotificationEngine, { NotificationOptions, } from './NotificationEngine';
+import NotificationEngine, { NotificationOptions } from './NotificationEngine';
 
 const logger: Logger = new Logger('ObservableNotificationEngine');
 
