@@ -22,8 +22,14 @@ class DeezerService {
       let spotifyTrackId: string | null = null;
 
       // Attempt to search for the track on Spotify
-      let searchResult = await spotifyApiService.searchTrack(userId, track.trackName, track.artistName);
+      let searchResult = await spotifyApiService.searchTrack(userId, track.trackName, track.artistName, track.albumName);
 
+      // If not found, retry without album name
+      if (!searchResult?.tracks?.items?.length) {
+        searchResult = await spotifyApiService.searchTrack(userId, track.trackName, track.artistName);
+      }
+
+      
       // If not found, retry by removing parenthesized content from the track title
       if (!searchResult?.tracks?.items?.length) {
         const cleanTrackName = track.trackName.replace(/\s*\(.*?\)\s*/g, '').trim();
