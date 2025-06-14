@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx --watch --env-file=.env src/index.ts",
-    "typescript": "tsc --noEmit"
+    "typescript": "tsc --noEmit",
+    "build": "tsc"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",
