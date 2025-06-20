@@ -29,7 +29,6 @@ class DeezerService {
         searchResult = await spotifyApiService.searchTrack(userId, track.trackName, track.artistName);
       }
 
-      
       // If not found, retry by removing parenthesized content from the track title
       if (!searchResult?.tracks?.items?.length) {
         const cleanTrackName = track.trackName.replace(/\s*\(.*?\)\s*/g, '').trim();
