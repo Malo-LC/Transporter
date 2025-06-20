@@ -24,7 +24,7 @@ export default class DeezerApi {
 
   getExportProgressWebSocket(taskId: string): WebSocket {
     const protocol: string = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host: string = 'localhost:3000';
+    const host: string = `${window.location.host}/api`;
     return new WebSocket(`${protocol}//${host}/ws/export-progress/${taskId}`);
   }
 
