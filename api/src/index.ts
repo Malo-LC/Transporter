@@ -64,6 +64,7 @@ wss.on('connection', (ws: WebSocket, req) => {
 });
 
 server.on('upgrade', (request, socket, head) => {
+  console.log(`[WebSocket] Upgrade request received: ${request.url}`, request.method, request.upgrade);
   if (request.url?.startsWith('/api/ws/export-progress/')) {
 
     wss.handleUpgrade(request, socket, head, (ws) => {
