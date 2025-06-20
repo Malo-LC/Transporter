@@ -8,11 +8,6 @@ WORKDIR /app
 COPY package.json yarn.lock tsconfig.json ./
 COPY .yarnrc.prod.yml ./.yarnrc.yml
 COPY .yarn ./.yarn
-
-# Install dependencies
-RUN yarn install
-
-# Copy the rest of the application
 COPY src ./src
 
 # Build the application
