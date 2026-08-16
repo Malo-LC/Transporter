@@ -45,12 +45,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@scssVariables': path.resolve(__dirname, 'assets/scss/variables'),
-      '@api': path.resolve(__dirname, 'src/api'),
-      '@components': path.resolve(__dirname, 'src/components'),
-      '@i18n': path.resolve(__dirname, 'src/i18n'),
-      '@lib': path.resolve(__dirname, 'src/lib'),
-      '@services': path.resolve(__dirname, 'src/services'),
+      '@scssVariables': path.resolve(import.meta.dirname, 'assets/scss/variables'),
+      '@api': path.resolve(import.meta.dirname, 'src/api'),
+      '@components': path.resolve(import.meta.dirname, 'src/components'),
+      '@i18n': path.resolve(import.meta.dirname, 'src/i18n'),
+      '@lib': path.resolve(import.meta.dirname, 'src/lib'),
+      '@services': path.resolve(import.meta.dirname, 'src/services'),
     },
   },
 });
