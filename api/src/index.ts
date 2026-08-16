@@ -34,6 +34,7 @@ app.use(
 
 app.route('/api/deezer', deezerController);
 app.route('/api/spotify', spotifyController);
+app.get('/health', (c) => c.json({ status: 'ok' }));
 
 app.get(
   '/api/ws/export-progress/:taskId',
