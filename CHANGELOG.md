@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Malo-LC/Transporter/compare/v1.0.0...v1.0.1) (2026-08-16)
+
+
+### Bug Fixes
+
+* node env prod ([e60547a](https://github.com/Malo-LC/Transporter/commit/e60547addc30e3393c0a7f593fc1d475720ceefd))
+
 # 1.0.0 (2026-08-16)
 
 
