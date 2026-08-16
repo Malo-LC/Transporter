@@ -1,14 +1,14 @@
-import { SpotifyAuth } from '@api/spotify/data/SpotifyTypes';
+import type { SpotifyAuth } from '@api/spotify/data/SpotifyTypes';
 import SpotifyApi from '@api/spotify/SpotifyApi';
-import useMessages, { Messages } from '@i18n/hooks/messagesHook';
-import useLoader, { LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
+import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
+import useLoader, { type LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
 import useNotification from '@lib/plume-notification/NotificationHook';
 import { useOnComponentMounted } from '@lib/react-hooks-alias/ReactHooksAlias';
 import { CircularProgress } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
 import { useState } from 'react';
-import { HttpError } from 'simple-http-rest-client';
-import usePlumeTheme, { PlumeAdminThemeComponents } from '../hooks/ThemeHook';
+import type { HttpError } from 'simple-http-rest-client';
+import usePlumeTheme, { type PlumeAdminThemeComponents } from '../hooks/ThemeHook';
 import { DeezerExport } from './deezer-export/DeezerExport';
 import scss from './home.module.scss';
 
@@ -24,7 +24,8 @@ export default function Home() {
   const [userId, setUserId] = useState<string | undefined>(undefined);
 
   const loginToSpotify = async () => {
-    spotifyApi.login()
+    spotifyApi
+      .login()
       .then((url: string) => {
         window.location.href = url;
       })
@@ -33,7 +34,8 @@ export default function Home() {
 
   const fetchMe = () => {
     loader.monitor(
-      spotifyApi.fetchMe()
+      spotifyApi
+        .fetchMe()
         .then((response: SpotifyAuth) => {
           setIsAuthenticated(response.isAuthenticated);
           setUserId(response.userId);
@@ -50,41 +52,22 @@ export default function Home() {
   return (
     <Panel>
       <div className={scss.home}>
-        {
-          loader.isLoading
-            ? (
-              <CircularProgress />
-            )
-            : (
+        {loader.isLoading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            {isAuthenticated ? (
+              <p className={scss.homeConnected}>{messages.spotify.connectedAs(userId)}</p>
+            ) : (
               <>
-                {
-                  isAuthenticated
-                    ? (
-                      <p className={scss.homeConnected}>{messages.spotify.connectedAs(userId)}</p>
-                    )
-                    : (
-                      <>
-                        <h1>
-                          {messages.home.title}
-                        </h1>
-                        <div>
-                          {messages.home.description}
-                        </div>
-                        <Button onClick={loginToSpotify}>
-                          {messages.home.loginToSpotify}
-                        </Button>
-                      </>
-                    )
-                }
+                <h1>{messages.home.title}</h1>
+                <div>{messages.home.description}</div>
+                <Button onClick={loginToSpotify}>{messages.home.loginToSpotify}</Button>
               </>
-            )
-        }
-        {
-          isAuthenticated
-          && (
-            <DeezerExport />
-          )
-        }
+            )}
+          </>
+        )}
+        {isAuthenticated && <DeezerExport />}
       </div>
     </Panel>
   );

@@ -1,4 +1,4 @@
-import { CsvFileData, TrackData } from '../types/DeezerTypes';
+import type { CsvFileData, TrackData } from '../types/DeezerTypes';
 
 export class DeezerFileService {
   public static parseCsv(csvContent: string): CsvFileData | null {
@@ -14,7 +14,7 @@ export class DeezerFileService {
       return null; // Retourne null s'il n'y a pas de lignes de données
     }
 
-    let playlistName = dataLines[0].split('","')[3]?.trim().replaceAll('"', '') ?? '';
+    const playlistName = dataLines[0].split('","')[3]?.trim().replaceAll('"', '') ?? '';
 
     const tracks: TrackData[] = [];
 

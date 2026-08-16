@@ -1,4 +1,4 @@
-import { TrackData } from '../types/DeezerTypes';
+import type { TrackData } from '../types/DeezerTypes';
 import spotifyApiService from './SpotifyApiService';
 import spotifyService from './SpotifyService';
 
@@ -11,7 +11,7 @@ class DeezerService {
     tracks: TrackData[],
     spotifyPlaylistId: string,
     isLikes: boolean = false,
-    callBackProgress?: (progress: number, songName: string) => void
+    callBackProgress?: (progress: number, songName: string) => void,
   ): Promise<string[]> {
     const spotifyUris: string[] = [];
     const missingTracks: string[] = [];
@@ -63,4 +63,4 @@ class DeezerService {
 }
 
 const deezerService = new DeezerService();
-export default deezerService; 
+export default deezerService;

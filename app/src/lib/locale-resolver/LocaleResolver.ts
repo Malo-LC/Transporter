@@ -1,18 +1,16 @@
 export type Locale = {
-  code: string,
-  name: string,
+  code: string;
+  name: string;
 };
 
-export interface LocaleResolverFunction {
-  (localeResolver: LocaleResolver): Locale | undefined,
-}
+export type LocaleResolverFunction = (localeResolver: LocaleResolver) => Locale | undefined;
 
 export type LocaleResolverParameters = {
-  fallbackLocale: Locale,
-  availableLocales: Locale[],
-  localeStorage?: Storage,
-  localeStorageKey?: string,
-  resolvers?: LocaleResolverFunction[],
+  fallbackLocale: Locale;
+  availableLocales: Locale[];
+  localeStorage?: Storage;
+  localeStorageKey?: string;
+  resolvers?: LocaleResolverFunction[];
 };
 
 export class LocaleResolver {
@@ -28,9 +26,7 @@ export class LocaleResolver {
 
   constructor(parameters: LocaleResolverParameters) {
     this.fallbackLocale = parameters.fallbackLocale;
-    this.indexedLocales = new Map(
-      parameters.availableLocales.map((locale: Locale) => [locale.code, locale]),
-    );
+    this.indexedLocales = new Map(parameters.availableLocales.map((locale: Locale) => [locale.code, locale]));
     this.localeStorage = parameters.localeStorage;
     this.resolvers = parameters.resolvers ?? [];
     this.localeStorageKey = parameters.localeStorageKey ?? 'lang';
@@ -62,7 +58,7 @@ export class LocaleResolver {
 
   static tryResolveFromStorage(localeResolver: LocaleResolver): Locale | undefined {
     if (localeResolver.localeStorage === undefined) {
-      throw new Error('Trying to resolve locale from storage whereas the \'localeStorage\' parameter is undefined');
+      throw new Error("Trying to resolve locale from storage whereas the 'localeStorage' parameter is undefined");
     }
     const storageLocaleCode: string | null = localeResolver.localeStorage.getItem(localeResolver.localeStorageKey);
     return storageLocaleCode ? localeResolver.tryFindMatchingLocale(storageLocaleCode) : undefined;

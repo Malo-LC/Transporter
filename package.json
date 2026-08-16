@@ -1,0 +1,25 @@
+{
+  "name": "transporter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["app", "api"],
+  "scripts": {
+    "dev": "bun run --parallel --filter '*' dev",
+    "build": "bun run --filter app build && bun run --filter api build && bun run copy-static",
+    "copy-static": "rm -rf api/dist/static && cp -r app/build api/dist/static",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "typescript": "bun run --filter '*' typescript",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.8",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@types/node": "^22.15.18",
+    "semantic-release": "^24.2.3",
+    "typescript": "^5.8.3"
+  }
+}

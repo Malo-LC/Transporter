@@ -1,7 +1,7 @@
 /* eslint-disable @stylistic/max-len */
 import { viteHotContext } from '@i18n/translations/hmr-config';
-import { observable, WritableObservable } from 'micro-observables';
-import { Translations } from './Translations';
+import { observable, type WritableObservable } from 'micro-observables';
+import type { Translations } from './Translations';
 import translationHotReload from './translations-hmr';
 
 const enMessages: Translations = {
@@ -34,8 +34,7 @@ const enMessages: Translations = {
   // common messages
   message: {
     changes_saved: 'Changes have been successfully saved',
-    unsaved_data: 'There are unsaved changes. '
-      + 'If you would like to save changes, press the "Keep editing" button',
+    unsaved_data: 'There are unsaved changes. ' + 'If you would like to save changes, press the "Keep editing" button',
   },
   // navigation
   nav: {
@@ -126,7 +125,8 @@ const enMessages: Translations = {
       empty_field: 'The field entered is empty',
     },
     security: {
-      fingerprint_missing: 'The fingerprint cookie to secure the JWT token seems to be missing. This may be ok in development, but in production, this cookie must be activated',
+      fingerprint_missing:
+        'The fingerprint cookie to secure the JWT token seems to be missing. This may be ok in development, but in production, this cookie must be activated',
     },
   },
   'http-errors': {

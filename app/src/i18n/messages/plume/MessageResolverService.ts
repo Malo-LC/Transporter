@@ -1,8 +1,8 @@
-import PlumeMessageResolver from '@lib/plume-messages/MessageResolver';
-import PlumeMessageResolverService from '@lib/plume-messages/MessageResolverService';
-import { Observable } from 'micro-observables';
-import { Translations } from '../../translations/Translations';
-import MessageService from '../MessageService';
+import type PlumeMessageResolver from '@lib/plume-messages/MessageResolver';
+import type PlumeMessageResolverService from '@lib/plume-messages/MessageResolverService';
+import type { Observable } from 'micro-observables';
+import type { Translations } from '../../translations/Translations';
+import type MessageService from '../MessageService';
 import MessageResolver from './MessageResolver';
 
 /**
@@ -13,10 +13,7 @@ export default class MessageResolverService implements PlumeMessageResolverServi
   private messageResolver: Observable<MessageResolver>;
 
   constructor(private readonly messageService: MessageService) {
-    this.messageResolver = this
-      .messageService
-      .getMessages()
-      .select((messages: Translations) => new MessageResolver(messages));
+    this.messageResolver = this.messageService.getMessages().select((messages: Translations) => new MessageResolver(messages));
   }
 
   getMessages(): Observable<PlumeMessageResolver> {

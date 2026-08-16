@@ -1,14 +1,12 @@
 import type { Context } from 'hono';
-import { CreateSpotifyPlaylistBody } from '../types/DeezerTypes';
 import spotifyApiService from '../service/SpotifyApiService';
+import type { CreateSpotifyPlaylistBody } from '../types/DeezerTypes';
 import { ErrorCodesEnum } from '../types/GlobalTypes';
 
 export async function validateDeezerPlaylistExport<T, U extends Context>(_value: T, c: U) {
   const userId: string = c.get('userId');
 
-  const {
-    name, description, public: isPublic = true, isLikes = false, playlistUrl,
-  } = await c.req.json<CreateSpotifyPlaylistBody>();
+  const { name, description, public: isPublic = true, isLikes = false, playlistUrl } = await c.req.json<CreateSpotifyPlaylistBody>();
 
   if (!playlistUrl) {
     return c.json({ errorCode: ErrorCodesEnum.BAD_REQUEST }, 400);

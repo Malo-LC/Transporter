@@ -1,14 +1,17 @@
-import { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
-import { PropsWithChildren } from 'react';
-import { FieldValues, FormContainer as MuiFormContainer } from 'react-hook-form-mui';
+import type { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
+import type { PropsWithChildren } from 'react';
+import { type FieldValues, FormContainer as MuiFormContainer } from 'react-hook-form-mui';
 
 import './forms.module.scss';
 
-function FormContainer<TFieldValues extends FieldValues = FieldValues>(
-  {
-    handleSubmit, children, FormProps, formContext, onSuccess, onError,
-  }: PropsWithChildren<FormContainerProps<TFieldValues>>,
-) {
+function FormContainer<TFieldValues extends FieldValues = FieldValues>({
+  handleSubmit,
+  children,
+  FormProps,
+  formContext,
+  onSuccess,
+  onError,
+}: PropsWithChildren<FormContainerProps<TFieldValues>>) {
   return (
     <MuiFormContainer<TFieldValues>
       formContext={formContext}

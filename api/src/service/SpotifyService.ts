@@ -1,7 +1,7 @@
-import { TrackData } from '../types/DeezerTypes';
-import spotifyApiService from './SpotifyApiService';
 import deezerTaskProgressService from '../service/DeezerTaskProgressService';
+import type { TrackData } from '../types/DeezerTypes';
 import deezerService from './DeezerService';
+import spotifyApiService from './SpotifyApiService';
 
 class SpotifyService {
   /**
@@ -28,7 +28,7 @@ class SpotifyService {
     name: string | undefined,
     isLikes: boolean,
     description?: string,
-    isPublic?: boolean
+    isPublic?: boolean,
   ): Promise<string | null> {
     if (isLikes) {
       return 'Liked Tracks'; // Special identifier for liked tracks
@@ -48,7 +48,7 @@ class SpotifyService {
     description: string | undefined,
     isPublic: boolean,
     deezerTracks: TrackData[],
-    t0: number
+    t0: number,
   ) {
     try {
       deezerTaskProgressService.updateTaskProgress(taskId, {
@@ -76,31 +76,32 @@ class SpotifyService {
             currentSong: currentProgress,
             totalSongs: total,
             percentage: percentage,
-            songName
+            songName,
           });
-        }
+        },
       );
 
       deezerTaskProgressService.updateTaskProgress(taskId, {
         status: 'completed',
         percentage: 100,
         spotifyPlaylistId: spotifyPlaylistId,
-        timeTaken: (performance.now() - t0),
+        timeTaken: performance.now() - t0,
         missingTracks,
       });
-
     } catch (error) {
       console.error(`Error during playlist processing for task ${taskId}:`, error);
       deezerTaskProgressService.updateTaskProgress(taskId, {
         status: 'error',
       });
     } finally {
-      setTimeout(() => {
-        deezerTaskProgressService.deleteTask(taskId);
-      }, 5 * 60 * 1000);
+      setTimeout(
+        () => {
+          deezerTaskProgressService.deleteTask(taskId);
+        },
+        5 * 60 * 1000,
+      );
     }
   }
-
 }
 
 const spotifyService = new SpotifyService();

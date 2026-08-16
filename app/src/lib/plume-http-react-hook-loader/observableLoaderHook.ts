@@ -1,6 +1,6 @@
-import { Observable, useObservable } from 'micro-observables';
-import { DependencyList, RefObject, useRef, useState } from 'react';
-import { HttpError } from 'simple-http-rest-client';
+import { type Observable, useObservable } from 'micro-observables';
+import { type DependencyList, type RefObject, useRef, useState } from 'react';
+import type { HttpError } from 'simple-http-rest-client';
 import { useEffectWithSsrSupport, useOnComponentUnMounted } from '../react-hooks-alias/ReactHooksAlias';
 
 /**
@@ -12,11 +12,11 @@ export type ObservableDataHandler<T> = {
   /**
    * The {@link Observable} data for which the loading process will be monitored
    */
-  dataObservable: Observable<T>,
+  dataObservable: Observable<T>;
   /**
    * The predicate that indicates if the current {@link Observable} data represents a loaded state or not
    */
-  isLoadedPredicate?: (data: T) => boolean,
+  isLoadedPredicate?: (data: T) => boolean;
   /**
    * The function that tries to load the {@link Observable} data.
    * This function must return some kind of `Promise`, `HttpPromise`,
@@ -24,7 +24,7 @@ export type ObservableDataHandler<T> = {
    *
    * This function will try to load only {@link Observable} data that are not yet loaded.
    */
-  loader: () => CatchablePromise,
+  loader: () => CatchablePromise;
 };
 
 /**
@@ -41,21 +41,21 @@ export type DataLoader<T> = {
    * In case an error has occurred, a button to retry loading the data should be proposed to
    * the user. The `onClick` property of the button should point to the {@link loader}
    */
-  error?: HttpError,
+  error?: HttpError;
   /**
    * `True` if the {@link Observable} data is being loaded
    */
-  isLoading: boolean,
+  isLoading: boolean;
   /**
    * `True` if the {@link Observable} data is available, else `false`
    */
-  isLoaded: boolean,
+  isLoaded: boolean;
   /**
    * A function that will try to load again the data.
    *
    * When the loaded is executed, the {@link error} is cleared.
    */
-  loader: () => void,
+  loader: () => void;
   /**
    * The loaded data once available (i.e. when {@link isLoaded === true}.
    * If no data is available, the `data` field is `undefined`.
@@ -65,7 +65,7 @@ export type DataLoader<T> = {
    * that want to access the available data. This enables to easily create manually {@link DataLoader}
    * to use Loading components.
    */
-  data?: T,
+  data?: T;
 };
 
 /**
@@ -74,7 +74,7 @@ export type DataLoader<T> = {
  * Errors must be of type {@link HttpError}
  */
 export type CatchablePromise = {
-  catch: (consumer: (error: HttpError) => void) => unknown,
+  catch: (consumer: (error: HttpError) => void) => unknown;
 };
 
 /**
@@ -85,18 +85,18 @@ export type ObservableLoaderConfig<T extends ObservableDataHandler<any>[]> = {
   /**
    * The hook used to execute the {@link Observable} data load, see {@link DataLoader.loader}
    */
-  useOnComponentMountedHook: (callback: () => void) => void,
+  useOnComponentMountedHook: (callback: () => void) => void;
   /**
    * The array of {@link ObservableDataHandler}
    */
-  observableSources: T,
+  observableSources: T;
 };
 
 type LoadableData = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
-  isLoaded: boolean,
-  loader: () => CatchablePromise,
+  data: any;
+  isLoaded: boolean;
+  loader: () => CatchablePromise;
 };
 
 /**
@@ -104,11 +104,9 @@ type LoadableData = {
  * specify the hook used to execute the {@link Observable} data load, see {@link DataLoader.loader}.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useObservableLoaderConfigurable<T extends ObservableDataHandler<any>[]>(
-  config: ObservableLoaderConfig<T>): DataLoader<unknown[]> {
+export function useObservableLoaderConfigurable<T extends ObservableDataHandler<any>[]>(config: ObservableLoaderConfig<T>): DataLoader<unknown[]> {
   // first check the data loaded status
-  const allDataLoadable: LoadableData[] = config
-    .observableSources
+  const allDataLoadable: LoadableData[] = config.observableSources
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .map((dataObservable: ObservableDataHandler<any>) => {
       // the number of observable sources is fixed and cannot change,
@@ -118,14 +116,11 @@ export function useObservableLoaderConfigurable<T extends ObservableDataHandler<
 
       return {
         loader: dataObservable.loader,
-        isLoaded: dataObservable.isLoadedPredicate
-          ? dataObservable.isLoadedPredicate(data)
-          : data !== undefined,
+        isLoaded: dataObservable.isLoadedPredicate ? dataObservable.isLoadedPredicate(data) : data !== undefined,
         data,
       };
     });
-  const isAllDataLoaded: boolean = allDataLoadable
-    .every((dataLoadable: LoadableData) => dataLoadable.isLoaded);
+  const isAllDataLoaded: boolean = allDataLoadable.every((dataLoadable: LoadableData) => dataLoadable.isLoaded);
 
   const isMountedRef: RefObject<boolean> = useRef<boolean>(true);
   const [loadingError, setLoadingError] = useState<HttpError>();
@@ -136,14 +131,12 @@ export function useObservableLoaderConfigurable<T extends ObservableDataHandler<
     for (const dataLoadable of allDataLoadable) {
       // try to load only unloaded data
       if (!dataLoadable.isLoaded) {
-        dataLoadable
-          .loader()
-          .catch((error: HttpError) => {
-            // don't update state if the component is unmounted to avoid errors
-            if (isMountedRef) {
-              setLoadingError(error);
-            }
-          });
+        dataLoadable.loader().catch((error: HttpError) => {
+          // don't update state if the component is unmounted to avoid errors
+          if (isMountedRef) {
+            setLoadingError(error);
+          }
+        });
       }
     }
   };
@@ -160,11 +153,7 @@ export function useObservableLoaderConfigurable<T extends ObservableDataHandler<
     isLoading: loadingError === undefined && !isAllDataLoaded,
     isLoaded: isAllDataLoaded,
     loader: loaderWithErrorHandling,
-    data: isAllDataLoaded
-      ? allDataLoadable.map((loadedData: LoadableData) => (
-        loadedData.data
-      ))
-      : undefined,
+    data: isAllDataLoaded ? allDataLoadable.map((loadedData: LoadableData) => loadedData.data) : undefined,
   };
 }
 

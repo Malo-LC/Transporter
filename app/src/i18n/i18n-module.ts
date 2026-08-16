@@ -1,6 +1,6 @@
 import { LocaleResolver } from '@lib/locale-resolver/LocaleResolver';
 import PlumeMessageResolverService from '@lib/plume-messages/MessageResolverService';
-import { Injector } from 'plume-ts-di';
+import type { Injector } from 'plume-ts-di';
 import LocaleResolverFactory from './locale/LocaleResolverFactory';
 import LocaleService from './locale/LocaleService';
 import MessageService from './messages/MessageService';

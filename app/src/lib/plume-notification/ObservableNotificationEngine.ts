@@ -1,12 +1,13 @@
-import { observable, WritableObservable } from 'micro-observables';
+import { observable, type WritableObservable } from 'micro-observables';
 import { Logger } from 'simple-logging-system';
-import NotificationEngine, { NotificationOptions } from './NotificationEngine';
+import type NotificationEngine from './NotificationEngine';
+import type { NotificationOptions } from './NotificationEngine';
 
 const logger: Logger = new Logger('ObservableNotificationEngine');
 
 export type Notification = {
-  message: string,
-  options?: NotificationOptions,
+  message: string;
+  options?: NotificationOptions;
 };
 
 export default class ObservableNotificationEngine implements NotificationEngine {

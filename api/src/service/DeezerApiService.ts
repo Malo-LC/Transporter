@@ -1,5 +1,5 @@
-import ky, { KyInstance } from 'ky';
-import { DeezerTracks } from '../types/DeezerTypes';
+import ky, { type KyInstance } from 'ky';
+import type { DeezerTracks } from '../types/DeezerTypes';
 
 class DeezerApiService {
   private readonly client: KyInstance;

@@ -5,7 +5,7 @@ import spotifyApiService from '../service/SpotifyApiService';
 
 type Context = {
   userId: string | undefined;
-}
+};
 
 const spotifyController = new Hono<{ Variables: Context }>();
 
@@ -47,17 +47,13 @@ spotifyController.get('/callback', async (c) => {
 
   const userId = await spotifyApiService.fetchAndSetAccessToken(code);
 
-  await setSignedCookie(
-    c,
-    'userId',
-    userId,
-    SECRET_COOKIE_KEY, {
-      httpOnly: true,
-      path: '/',
-      secure: NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: COOKIE_MAX_AGE,
-    });
+  await setSignedCookie(c, 'userId', userId, SECRET_COOKIE_KEY, {
+    httpOnly: true,
+    path: '/',
+    secure: NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: COOKIE_MAX_AGE,
+  });
 
   return c.json('Spotify authentication successful', 200);
 });

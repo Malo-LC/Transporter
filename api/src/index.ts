@@ -1,17 +1,21 @@
-import { serve } from '@hono/node-server';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Hono } from 'hono';
+import { serveStatic, upgradeWebSocket, websocket } from 'hono/bun';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
-import { WebSocket, WebSocketServer } from 'ws';
 import { NODE_ENV, PORT } from './config';
 import deezerController from './controllers/DeezerController';
 import spotifyController from './controllers/SpotifyController';
-// --- End WebSocket Server Imports ---
+
+const isDevEnvironment = NODE_ENV === 'development';
+
 const app = new Hono();
 
-if (NODE_ENV === 'development') {
+if (isDevEnvironment) {
   console.log('Running in development mode');
   app.use(prettyJSON());
   app.use(logger());
@@ -28,49 +32,64 @@ app.use(
   }),
 );
 
-app.get('/', (c) => c.text('Hono!'));
-
 app.route('/api/deezer', deezerController);
 app.route('/api/spotify', spotifyController);
 
+app.get(
+  '/api/ws/export-progress/:taskId',
+  upgradeWebSocket((c) => {
+    const { taskId } = c.req.param();
+
+    return {
+      onOpen(_event, ws) {
+        if (!taskId) {
+          console.warn('[WebSocket] Client connected without taskId in URL. Closing connection.');
+          ws.close(1008, 'No taskId provided');
+          return;
+        }
+        deezerController.registerWebSocketForTask(taskId, ws);
+      },
+      onClose(_event, ws) {
+        deezerController.unregisterWebSocketForTask(taskId, ws);
+      },
+      onError(_event, ws) {
+        console.error(`[WebSocket] Error for taskId ${taskId}`);
+        deezerController.unregisterWebSocketForTask(taskId, ws);
+      },
+    };
+  }),
+);
+
+const distStaticRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), 'static');
+
+const staticRoot = existsSync(distStaticRoot)
+  ? distStaticRoot
+  : existsSync(path.resolve(process.cwd(), 'static'))
+    ? path.resolve(process.cwd(), 'static')
+    : path.resolve(process.cwd(), 'dist/static');
+
+if (!isDevEnvironment) {
+  app.use(
+    '/*',
+    serveStatic({
+      root: staticRoot,
+    }),
+  );
+
+  app.get('*', async (c, next) => {
+    // On ignore les routes API pour ne pas renvoyer de l'HTML sur une erreur 404 API
+    if (c.req.path.startsWith('/api/')) {
+      return next();
+    }
+
+    return c.html(await Bun.file(path.join(staticRoot, 'index.html')).text());
+  });
+}
+
 console.log(`Server is running on port ${PORT}`);
 
-const server = serve({
-  fetch: app.fetch,
+export default {
   port: PORT,
-});
-
-export const wss = new WebSocketServer({ noServer: true });
-
-// --- WebSocket connection handling ---
-wss.on('connection', (ws: WebSocket, req) => {
-  const taskId = req.url?.split('/').pop();
-  if (taskId) {
-    // Attach the WebSocket to the specific task
-    deezerController.registerWebSocketForTask(taskId, ws);
-  } else {
-    console.warn('[WebSocket] Client connected without taskId in URL. Closing connection.');
-    ws.close(1008, 'No taskId provided'); // 1008: Policy Violation
-  }
-
-  ws.on('close', () => {
-    deezerController.unregisterWebSocketForTask(taskId, ws);
-  });
-
-  ws.on('error', (error) => {
-    console.error(`[WebSocket] Error for taskId ${taskId}:`, error);
-    deezerController.unregisterWebSocketForTask(taskId, ws); // Ensure cleanup on error
-  });
-});
-
-server.on('upgrade', (request, socket, head) => {
-  console.log(`[WebSocket] Upgrade request received: ${request.url}`, request.method, request.upgrade);
-  if (request.url?.startsWith('/api/ws/export-progress/')) {
-
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
-    });
-  } else {
-    socket.destroy();
-  }
-});
+  fetch: app.fetch,
+  websocket,
+};

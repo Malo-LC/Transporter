@@ -10,7 +10,7 @@
 // 3. execute JS statement: document.body.innerText.split('\n').map((icon) => `'${icon.split(' ')[0]}'`).join(" | ")
 
 export type IconType =
-  '10k'
+  | '10k'
   | '10mp'
   | '11mp'
   | '123'

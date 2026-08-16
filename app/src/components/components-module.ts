@@ -1,5 +1,5 @@
 import PlumeAdminTheme from '@lib/plume-admin-theme/PlumeAdminTheme';
-import { Injector } from 'plume-ts-di';
+import type { Injector } from 'plume-ts-di';
 import AdminTheme from './theme/AdminTheme';
 import NotificationRenderer from './theme/NotificationRenderer';
 

@@ -1,8 +1,9 @@
-import SessionApi, { SessionCredentials } from '@api/session/SessionApi';
-import { IdlenessDetector, JwtSessionManager, RefreshableJwtToken } from 'browser-user-session';
-import { Scheduler } from 'simple-job-scheduler';
-import Permission from './Permission';
-import { UserWithExpiration } from './User';
+import type SessionApi from '@api/session/SessionApi';
+import type { SessionCredentials } from '@api/session/SessionApi';
+import { type IdlenessDetector, JwtSessionManager, type RefreshableJwtToken } from 'browser-user-session';
+import type { Scheduler } from 'simple-job-scheduler';
+import type Permission from './Permission';
+import type { UserWithExpiration } from './User';
 
 const THRESHOLD_IN_MILLIS_TO_DETECT_EXPIRED_SESSION: number = 60 * 1000; // 1 minutes
 const LOCAL_STORAGE_CURRENT_SESSION: string = 'user-session';
@@ -16,16 +17,11 @@ export default class SessionService {
     private readonly scheduler: Scheduler,
     private readonly idlenessDetector: IdlenessDetector,
   ) {
-    this.jwtSessionManager = new JwtSessionManager<UserWithExpiration>(
-      sessionApi,
-      scheduler,
-      idlenessDetector,
-      {
-        localStorageCurrentSession: LOCAL_STORAGE_CURRENT_SESSION,
-        thresholdInMillisToDetectExpiredSession: THRESHOLD_IN_MILLIS_TO_DETECT_EXPIRED_SESSION,
-        httpErrorAlreadyExpiredSessionToken: HTTP_ERROR_ALREADY_EXPIRED_SESSION_TOKEN,
-      },
-    );
+    this.jwtSessionManager = new JwtSessionManager<UserWithExpiration>(sessionApi, scheduler, idlenessDetector, {
+      localStorageCurrentSession: LOCAL_STORAGE_CURRENT_SESSION,
+      thresholdInMillisToDetectExpiredSession: THRESHOLD_IN_MILLIS_TO_DETECT_EXPIRED_SESSION,
+      httpErrorAlreadyExpiredSessionToken: HTTP_ERROR_ALREADY_EXPIRED_SESSION_TOKEN,
+    });
   }
 
   // data access
@@ -43,16 +39,13 @@ export default class SessionService {
   }
 
   hasPermission(permission: Permission) {
-    return this.jwtSessionManager.getCurrentUser().select((user?: UserWithExpiration) => (
-      user?.permissions.includes(permission) ?? false),
-    );
+    return this.jwtSessionManager.getCurrentUser().select((user?: UserWithExpiration) => user?.permissions.includes(permission) ?? false);
   }
 
   // actions
 
   authenticate(credentials: SessionCredentials) {
-    return this
-      .sessionApi
+    return this.sessionApi
       .authenticate(credentials)
       .then((sessionToken: RefreshableJwtToken) => this.jwtSessionManager.registerNewSession(sessionToken));
   }

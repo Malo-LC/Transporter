@@ -1,19 +1,19 @@
 import DeezerApi from '@api/deezer/DeezerApi';
-import useMessages, { Messages } from '@i18n/hooks/messagesHook';
+import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
 import useNotification from '@lib/plume-notification/NotificationHook';
 import { getGlobalInstance } from 'plume-ts-di';
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { Logger } from 'simple-logging-system';
 
 export type ProgressData = {
-  status: 'pending' | 'transferring' | 'completed' | 'error',
-  percentage: number,
-  currentSong: number,
-  songName?: string,
-  totalSongs: number,
-  spotifyPlaylistId?: string,
-  missingTracks?: string[],
-  timeTaken?: string,
+  status: 'pending' | 'transferring' | 'completed' | 'error';
+  percentage: number;
+  currentSong: number;
+  songName?: string;
+  totalSongs: number;
+  spotifyPlaylistId?: string;
+  missingTracks?: string[];
+  timeTaken?: string;
 };
 const logger: Logger = new Logger('useExportProgress');
 
@@ -25,15 +25,12 @@ export function useExportProgress() {
   const [transferProgress, setTransferProgress] = useState<ProgressData | null>(null);
   const wsRef: RefObject<WebSocket | null> = useRef<WebSocket | null>(null);
 
-  const closeWebSocket: (code?: number, reason?: string) => void = useCallback(
-    (code: number = 1000, reason: string = 'Client action') => {
-      if (wsRef.current) {
-        wsRef.current.close(code, reason);
-        wsRef.current = null;
-      }
-    },
-    [],
-  );
+  const closeWebSocket: (code?: number, reason?: string) => void = useCallback((code: number = 1000, reason: string = 'Client action') => {
+    if (wsRef.current) {
+      wsRef.current.close(code, reason);
+      wsRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -41,41 +38,55 @@ export function useExportProgress() {
     };
   }, [closeWebSocket]);
 
-  const startWebSocketConnection: (taskId: string) => void = useCallback((taskId: string) => {
-    closeWebSocket(1000, 'New transfer initiated');
-    setTransferProgress(null);
+  const startWebSocketConnection: (taskId: string) => void = useCallback(
+    (taskId: string) => {
+      closeWebSocket(1000, 'New transfer initiated');
+      setTransferProgress(null);
 
-    setTransferProgress({
-      status: 'pending',
-      percentage: 0,
-      currentSong: 0,
-      totalSongs: 0,
-    });
-
-    const ws: WebSocket = deezerApi.getExportProgressWebSocket(taskId);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      setTransferProgress((prev: ProgressData | null) => ({
-        ...(prev as ProgressData),
+      setTransferProgress({
         status: 'pending',
-      }));
-    };
+        percentage: 0,
+        currentSong: 0,
+        totalSongs: 0,
+      });
 
-    ws.onmessage = (event: MessageEvent<string>) => {
-      try {
-        const progressData: ProgressData = JSON.parse(event.data);
-        setTransferProgress(progressData);
+      const ws: WebSocket = deezerApi.getExportProgressWebSocket(taskId);
+      wsRef.current = ws;
 
-        if (progressData.status === 'completed') {
-          notifySuccess(messages.deezer.success);
-          closeWebSocket(1000, 'Transfer completed by server');
-        } else if (progressData.status === 'error') {
+      ws.onopen = () => {
+        setTransferProgress((prev: ProgressData | null) => ({
+          ...(prev as ProgressData),
+          status: 'pending',
+        }));
+      };
+
+      ws.onmessage = (event: MessageEvent<string>) => {
+        try {
+          const progressData: ProgressData = JSON.parse(event.data);
+          setTransferProgress(progressData);
+
+          if (progressData.status === 'completed') {
+            notifySuccess(messages.deezer.success);
+            closeWebSocket(1000, 'Transfer completed by server');
+          } else if (progressData.status === 'error') {
+            notifyError(messages.deezer.transferError);
+            closeWebSocket(1000, 'Transfer failed by server');
+          }
+        } catch (error) {
+          logger.error('[WebSocket] Error parsing message data:', error);
           notifyError(messages.deezer.transferError);
-          closeWebSocket(1000, 'Transfer failed by server');
+          setTransferProgress({
+            status: 'error',
+            percentage: 0,
+            currentSong: 0,
+            totalSongs: 0,
+          });
+          closeWebSocket(1000, 'Data parsing error');
         }
-      } catch (error) {
-        logger.error('[WebSocket] Error parsing message data:', error);
+      };
+
+      ws.onerror = (errorEvent: Event) => {
+        logger.error('[WebSocket] Error:', errorEvent);
         notifyError(messages.deezer.transferError);
         setTransferProgress({
           status: 'error',
@@ -83,37 +94,27 @@ export function useExportProgress() {
           currentSong: 0,
           totalSongs: 0,
         });
-        closeWebSocket(1000, 'Data parsing error');
-      }
-    };
+        closeWebSocket(1000, 'WebSocket error');
+      };
 
-    ws.onerror = (errorEvent: Event) => {
-      logger.error('[WebSocket] Error:', errorEvent);
-      notifyError(messages.deezer.transferError);
-      setTransferProgress({
-        status: 'error',
-        percentage: 0,
-        currentSong: 0,
-        totalSongs: 0,
-      });
-      closeWebSocket(1000, 'WebSocket error');
-    };
-
-    ws.onclose = () => {
-      if (wsRef.current === ws) {
-        wsRef.current = null;
-      }
-
-      setTransferProgress((prev: ProgressData | null) => {
-        if (prev && prev.status !== 'completed' && prev.status !== 'error') {
-          return {
-            ...prev, status: 'error',
-          };
+      ws.onclose = () => {
+        if (wsRef.current === ws) {
+          wsRef.current = null;
         }
-        return prev;
-      });
-    };
-  }, [notifySuccess, notifyError, closeWebSocket]);
+
+        setTransferProgress((prev: ProgressData | null) => {
+          if (prev && prev.status !== 'completed' && prev.status !== 'error') {
+            return {
+              ...prev,
+              status: 'error',
+            };
+          }
+          return prev;
+        });
+      };
+    },
+    [notifySuccess, notifyError, closeWebSocket],
+  );
 
   return {
     transferProgress,

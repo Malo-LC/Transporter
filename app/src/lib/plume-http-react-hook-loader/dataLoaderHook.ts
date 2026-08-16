@@ -1,6 +1,6 @@
-import { DependencyList, RefObject, useEffect, useRef, useState } from 'react';
-import { DataLoader } from './observableLoaderHook';
-import useLoader, { LoaderState, LoadingPromise } from './promiseLoaderHook';
+import { type DependencyList, type RefObject, useEffect, useRef, useState } from 'react';
+import type { DataLoader } from './observableLoaderHook';
+import useLoader, { type LoaderState, type LoadingPromise } from './promiseLoaderHook';
 
 /**
  * Hook used to load data in a compatible way with {@link DataLoader}.
@@ -12,19 +12,19 @@ import useLoader, { LoaderState, LoadingPromise } from './promiseLoaderHook';
  * This function is called as soon as the component has been mounted, see {@link useOnComponentMounted}.
  * @param dependencies The dependencies that once updated should make the loader to reload the data
  */
-export default function useDataLoader<T>(
-  dataPromise: () => LoadingPromise<T>,
-  dependencies: DependencyList = [],
-): DataLoader<T> {
+export default function useDataLoader<T>(dataPromise: () => LoadingPromise<T>, dependencies: DependencyList = []): DataLoader<T> {
   const [data, setData] = useState<T>();
   const isMountedRef: RefObject<boolean> = useRef<boolean>(true);
   const loader: LoaderState = useLoader();
-  const dataLoader = () => loader.monitor(dataPromise().then((result: T) => {
-    // don't update state if the component is unmounted to avoid errors
-    if (isMountedRef) {
-      setData(result);
-    }
-  }));
+  const dataLoader = () =>
+    loader.monitor(
+      dataPromise().then((result: T) => {
+        // don't update state if the component is unmounted to avoid errors
+        if (isMountedRef) {
+          setData(result);
+        }
+      }),
+    );
 
   useEffect(() => {
     // load the data as soon as the component is mounted or when the dependencies change

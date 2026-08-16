@@ -3,6 +3,6 @@
  * You can declare here any type of file that you want to import
  */
 
-declare module '*.png'
-declare module '*.jpg'
-declare module '*.gif'
+declare module '*.png';
+declare module '*.jpg';
+declare module '*.gif';

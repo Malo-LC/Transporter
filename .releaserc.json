@@ -1,0 +1,33 @@
+{
+    "branches": [
+        "main"
+    ],
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        "@semantic-release/changelog",
+        [
+            "@semantic-release/npm",
+            {
+                "npmPublish": false
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "assets": [
+                    "CHANGELOG.md",
+                    "package.json"
+                ],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "publishCmd": "docker build --build-arg VERSION=${nextRelease.version} --build-arg REVISION=${nextRelease.gitHead} --build-arg CREATED=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t ghcr.io/malo-lc/transporter:${nextRelease.version} -t ghcr.io/malo-lc/transporter:latest . && docker push ghcr.io/malo-lc/transporter:${nextRelease.version} && docker push ghcr.io/malo-lc/transporter:latest"
+            }
+        ],
+        "@semantic-release/github"
+    ]
+}

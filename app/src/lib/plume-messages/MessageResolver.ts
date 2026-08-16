@@ -1,8 +1,6 @@
-import { HttpError } from 'simple-http-rest-client';
+import type { HttpError } from 'simple-http-rest-client';
 
-export interface MessageResolver {
-  (messageKey: string, ...messageArgs: string[]): string,
-}
+export type MessageResolver = (messageKey: string, ...messageArgs: string[]) => string;
 
 /**
  * Interface utilisée pour les écrans d'administration Plume.

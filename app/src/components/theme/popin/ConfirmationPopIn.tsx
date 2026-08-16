@@ -1,5 +1,5 @@
 import ActionStyle from '@lib/plume-admin-theme/action/ActionStyle';
-import { ConfirmationPopInProps } from '@lib/plume-admin-theme/popin/PopinProps';
+import type { ConfirmationPopInProps } from '@lib/plume-admin-theme/popin/PopinProps';
 import { ActionButton, ActionsContainer } from '../action/Actions';
 import Popin from './Popin';
 
@@ -15,13 +15,7 @@ import scss from './popin.module.scss';
  * @param onConfirm configuration action when confirming
  * @param onCancel configuration action when cancelling
  */
-export default function ConfirmationPopIn({
-  title,
-  message,
-  isOpen,
-  onConfirm,
-  onCancel,
-}: Readonly<ConfirmationPopInProps>) {
+export default function ConfirmationPopIn({ title, message, isOpen, onConfirm, onCancel }: Readonly<ConfirmationPopInProps>) {
   return (
     <Popin
       title={title}

@@ -1,12 +1,12 @@
-import { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
-import { ListHeadProps, ListItemProps, ListProps } from '@lib/plume-admin-theme/list/ListProps';
-import { ReactNode } from 'react';
-import { FieldValues } from 'react-hook-form';
-import { ActionButtonProps, ActionContainerProps, ActionLinkProps } from './action/ActionProps';
-import { FormFieldProps } from './form/FormFieldProps';
-import { InputPasswordProps, InputSelectProps, InputTextProps } from './form/FormInputProps';
-import { PanelProps } from './panel/PanelProps';
-import { ConfirmationPopInProps, PopinProps } from './popin/PopinProps';
+import type { FormContainerProps } from '@lib/plume-admin-theme/form/FormProps';
+import type { ListHeadProps, ListItemProps, ListProps } from '@lib/plume-admin-theme/list/ListProps';
+import type { ReactNode } from 'react';
+import type { FieldValues } from 'react-hook-form';
+import type { ActionButtonProps, ActionContainerProps, ActionLinkProps } from './action/ActionProps';
+import type { FormFieldProps } from './form/FormFieldProps';
+import type { InputPasswordProps, InputSelectProps, InputTextProps } from './form/FormInputProps';
+import type { PanelProps } from './panel/PanelProps';
+import type { ConfirmationPopInProps, PopinProps } from './popin/PopinProps';
 
 export default abstract class PlumeAdminTheme {
   // layout
@@ -35,9 +35,7 @@ export default abstract class PlumeAdminTheme {
 
   // form
 
-  abstract formContainer: <TFieldValues extends FieldValues = FieldValues>(
-    props: FormContainerProps<TFieldValues>,
-  ) => ReactNode;
+  abstract formContainer: <TFieldValues extends FieldValues = FieldValues>(props: FormContainerProps<TFieldValues>) => ReactNode;
 
   // form fields
 

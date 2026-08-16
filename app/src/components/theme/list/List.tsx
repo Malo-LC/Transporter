@@ -1,12 +1,11 @@
-import useMessages, { Messages } from '@i18n/hooks/messagesHook';
+import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
 import classNames from '@lib/class-names/ClassNames';
-import { ListProps } from '@lib/plume-admin-theme/list/ListProps';
-
-import scss from './list.module.scss';
+import type { ListProps } from '@lib/plume-admin-theme/list/ListProps';
 import ListLoader from './ListLoader';
+import scss from './list.module.scss';
 
 type ListEmptyStateProps = {
-  label: string,
+  label: string;
 };
 
 function EmptyState({ label }: Readonly<ListEmptyStateProps>) {
@@ -23,14 +22,7 @@ function EmptyState({ label }: Readonly<ListEmptyStateProps>) {
  * - An empty state is displayed when no elements were found
  * - Otherwise, the elements are displayed through the {@param children}
  */
-function List({
-  isEmpty,
-  isLoading = false,
-  showLoader = true,
-  emptyStateLabel,
-  className,
-  children,
-}: Readonly<ListProps>) {
+function List({ isEmpty, isLoading = false, showLoader = true, emptyStateLabel, className, children }: Readonly<ListProps>) {
   const { messages }: Messages = useMessages();
 
   if (isLoading && showLoader) {
@@ -47,11 +39,7 @@ function List({
       </div>
     );
   }
-  return (
-    <div className={classNames(scss.list, className)}>
-      {children}
-    </div>
-  );
+  return <div className={classNames(scss.list, className)}>{children}</div>;
 }
 
 export default List;

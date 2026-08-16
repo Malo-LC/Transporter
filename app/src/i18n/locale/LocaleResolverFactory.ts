@@ -1,5 +1,5 @@
 import { LocaleResolver } from '@lib/locale-resolver/LocaleResolver';
-import { Provider } from 'plume-ts-di';
+import type { Provider } from 'plume-ts-di';
 import LocaleService from './LocaleService';
 
 /**
@@ -11,10 +11,7 @@ export default class LocaleResolverFactory implements Provider<LocaleResolver> {
   constructor() {
     this.localeResolver = new LocaleResolver({
       fallbackLocale: LocaleService.LOCALE_FR,
-      availableLocales: [
-        LocaleService.LOCALE_FR,
-        LocaleService.LOCALE_EN,
-      ],
+      availableLocales: [LocaleService.LOCALE_FR, LocaleService.LOCALE_EN],
       localeStorage: window.localStorage,
       resolvers: [LocaleResolver.tryResolveFromStorage, LocaleResolver.tryResolveFromBrowser],
     });

@@ -1,8 +1,8 @@
-import { RefObject, useRef, useState } from 'react';
-import { genericError, HttpError, isHttpError } from 'simple-http-rest-client';
+import { type RefObject, useRef, useState } from 'react';
+import { genericError, type HttpError, isHttpError } from 'simple-http-rest-client';
 import { Logger } from 'simple-logging-system';
 import { useOnComponentUnMounted } from '../react-hooks-alias/ReactHooksAlias';
-import { AnyPromise } from './AnyPromise';
+import type { AnyPromise } from './AnyPromise';
 
 const logger: Logger = new Logger('promiseLoaderHook');
 
@@ -23,9 +23,12 @@ const sanitizePromiseError = (error: HttpError) => {
   if (isHttpError(error)) {
     return error;
   }
-  logger.debug('Promise error is not an HttpError,'
-    + 'if you monitor for loading raw Promise, make sure to: 1/ catch errors 2/ transform it'
-    + 'to HttpError 3/ throw it', error);
+  logger.debug(
+    'Promise error is not an HttpError,' +
+      'if you monitor for loading raw Promise, make sure to: 1/ catch errors 2/ transform it' +
+      'to HttpError 3/ throw it',
+    error,
+  );
   return genericError;
 };
 
@@ -39,20 +42,20 @@ export type LoaderState = {
   /**
    * The error that might have occurred during the loading of the monitored `Promise`, see {@link monitor}
    */
-  error?: HttpError,
+  error?: HttpError;
   /**
    * If the `Promise` is still running and waiting for result
    */
-  isLoading: boolean,
+  isLoading: boolean;
   /**
    * If a monitored `Promise` has been executed successfully without errors and no other `Promise` is currently running
    */
-  isLoaded: boolean,
+  isLoaded: boolean;
   /**
    * The main function provided by the hook {@link useLoader} to monitor the loading of a {@link LoadingPromise}.
    * @param httpPromise The `Promise` that needs to be monitored: is it loading? Has it raised any error?
    */
-  monitor: (httpPromise: LoadingPromise<unknown>) => void,
+  monitor: (httpPromise: LoadingPromise<unknown>) => void;
 };
 
 /**

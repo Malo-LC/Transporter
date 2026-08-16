@@ -1,5 +1,5 @@
-import { Locale, LocaleResolver } from '@lib/locale-resolver/LocaleResolver';
-import { observable, WritableObservable } from 'micro-observables';
+import type { Locale, LocaleResolver } from '@lib/locale-resolver/LocaleResolver';
+import { observable, type WritableObservable } from 'micro-observables';
 
 /**
  * Récupère la langue par défaut, et permet de changer la langue courante

@@ -1,28 +1,20 @@
 {
-  "name": "transporter",
+  "name": "api",
   "version": "1.0.0",
   "private": true,
   "description": "",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx --watch --env-file=.env src/index.ts",
+    "dev": "bun --watch --env-file=.env src/index.ts",
     "typescript": "tsc --noEmit",
-    "build": "tsc"
+    "build": "bun build --target=bun --outdir=dist src/index.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.1",
     "hono": "^4.7.9",
-    "ky": "^1.8.1",
-    "ws": "^8.18.2"
+    "ky": "^1.8.1"
   },
   "devDependencies": {
-    "@types/node": "^22.15.18",
-    "@types/ws": "^8",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
-  },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "packageManager": "yarn@4.9.1"
+    "@types/bun": "^1.2.13"
+  }
 }

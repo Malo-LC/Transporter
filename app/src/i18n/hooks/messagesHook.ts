@@ -1,12 +1,12 @@
 import { useObservable } from 'micro-observables';
 import { getGlobalInstance } from 'plume-ts-di';
-import { HttpError } from 'simple-http-rest-client';
+import type { HttpError } from 'simple-http-rest-client';
 import MessageService from '../messages/MessageService';
-import { Translations } from '../translations/Translations';
+import type { Translations } from '../translations/Translations';
 
 export type Messages = {
-  messages: Translations,
-  httpError: (error: HttpError) => string,
+  messages: Translations;
+  httpError: (error: HttpError) => string;
 };
 
 export default function useMessages(): Messages {

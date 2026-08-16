@@ -1,5 +1,5 @@
-import { Observable } from 'micro-observables';
-import PlumeMessageResolver from './MessageResolver';
+import type { Observable } from 'micro-observables';
+import type PlumeMessageResolver from './MessageResolver';
 
 /**
  * Return the observable message interface

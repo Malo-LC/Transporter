@@ -1,7 +1,7 @@
 import NotificationEngine from '@lib/plume-notification/NotificationEngine';
 import ObservableNotificationEngine from '@lib/plume-notification/ObservableNotificationEngine';
 import { BrowserUserActivityListener, IdlenessDetector, UserActivityListener } from 'browser-user-session';
-import { Injector } from 'plume-ts-di';
+import type { Injector } from 'plume-ts-di';
 import { Scheduler } from 'simple-job-scheduler';
 
 export default function installServicesModule(injector: Injector) {

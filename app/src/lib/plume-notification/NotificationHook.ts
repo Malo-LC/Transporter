@@ -1,14 +1,14 @@
 import useMessages from '@i18n/hooks/messagesHook';
 import NotificationEngine from '@lib/plume-notification/NotificationEngine';
 import { getGlobalInstance } from 'plume-ts-di';
-import { HttpError } from 'simple-http-rest-client';
+import type { HttpError } from 'simple-http-rest-client';
 
 export type PlumeNotification = {
-  notifyHttpError: (error: HttpError) => void,
-  notifyError: (text: string) => void,
-  notifySuccess: (text: string) => void,
-  notify: (text: string) => void,
-  notifyWarning: (text: string) => void,
+  notifyHttpError: (error: HttpError) => void;
+  notifyError: (text: string) => void;
+  notifySuccess: (text: string) => void;
+  notify: (text: string) => void;
+  notifyWarning: (text: string) => void;
 };
 
 function useNotification(): PlumeNotification {

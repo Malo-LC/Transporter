@@ -1,24 +1,24 @@
 import { Hono } from 'hono';
 import { getSignedCookie } from 'hono/cookie';
 import { validator } from 'hono/validator';
-import { WebSocket } from 'ws';
+import type { WSContext } from 'hono/ws';
 import { SECRET_COOKIE_KEY } from '../config';
-import { DeezerFileService } from '../service/DeezerFileService';
-import { DeezerTracks, TrackData } from '../types/DeezerTypes';
-import deezerTaskProgressService from '../service/DeezerTaskProgressService';
-import { validateDeezerFilePlaylistExport, validateDeezerPlaylistExport } from '../validator/deezerValidator';
 import deezerApiService from '../service/DeezerApiService';
+import { DeezerFileService } from '../service/DeezerFileService';
+import deezerTaskProgressService from '../service/DeezerTaskProgressService';
 import spotifyService from '../service/SpotifyService';
+import type { DeezerTracks, TrackData } from '../types/DeezerTypes';
 import { ErrorCodesEnum } from '../types/GlobalTypes';
+import { validateDeezerFilePlaylistExport, validateDeezerPlaylistExport } from '../validator/deezerValidator';
 
 type Context = {
   userId: string | undefined;
-}
+};
 
 export type AugmentedDeezerController = Hono<{ Variables: Context }> & {
-  registerWebSocketForTask(taskId: string, ws: WebSocket): void;
-  unregisterWebSocketForTask(taskId: string | undefined, ws: WebSocket): void;
-}
+  registerWebSocketForTask(taskId: string, ws: WSContext): void;
+  unregisterWebSocketForTask(taskId: string | undefined, ws: WSContext): void;
+};
 
 const deezerController: AugmentedDeezerController = new Hono<{ Variables: Context }>() as AugmentedDeezerController; // NOSONARR
 
@@ -31,12 +31,12 @@ deezerController.use('*', async (c, next) => {
   await next();
 });
 
-const registerWebSocketForTask = (taskId: string, ws: WebSocket) => {
+const registerWebSocketForTask = (taskId: string, ws: WSContext) => {
   deezerTaskProgressService.registerWebSocketForTask(taskId, ws);
 };
 
-const unregisterWebSocketForTask = (taskId: string, ws: WebSocket) => {
-  deezerTaskProgressService.unregisterWebSocketForTask(taskId, ws);
+const unregisterWebSocketForTask = (taskId: string | undefined, ws: WSContext) => {
+  deezerTaskProgressService.unregisterWebSocketForTask(taskId ?? '', ws);
 };
 
 // Expose these functions via the controller object for index.ts
@@ -48,9 +48,7 @@ Object.assign(deezerController, {
 deezerController.post('/start-playlist-export', validator('json', validateDeezerPlaylistExport), async (c) => {
   const t0 = performance.now();
 
-  const {
-    userId, name, description, isPublic, isLikes, playlistId
-  } = c.req.valid('json');
+  const { userId, name, description, isPublic, isLikes, playlistId } = c.req.valid('json');
 
   const taskId = `transfer-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
@@ -78,7 +76,7 @@ deezerController.post('/start-playlist-export', validator('json', validateDeezer
 
   (async () => {
     await spotifyService.processPlaylistTransfer(taskId, userId, name, isLikes, description, isPublic, deezerTracks, t0);
-  })().then(r => r);
+  })().then((r) => r);
 
   return c.json({ taskId }, 200);
 });
@@ -86,9 +84,7 @@ deezerController.post('/start-playlist-export', validator('json', validateDeezer
 deezerController.post('/file', validator('form', validateDeezerFilePlaylistExport), async (c) => {
   const t0 = performance.now();
 
-  const {
-    userId, name, isLikes, file, description, isPublic
-  } = c.req.valid('form');
+  const { userId, name, isLikes, file, description, isPublic } = c.req.valid('form');
 
   const taskId = `file-transfer-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
@@ -113,7 +109,7 @@ deezerController.post('/file', validator('form', validateDeezerFilePlaylistExpor
 
   (async () => {
     await spotifyService.processPlaylistTransfer(taskId, userId, name, isLikes, description, isPublic, deezerTracks, t0);
-  })().then(r => r);
+  })().then((r) => r);
 
   return c.json({ taskId }, 200);
 });

@@ -1,10 +1,12 @@
-import { WebSocket } from 'ws';
-import { TaskProgress } from '../types/DeezerTypes';
+import type { WSContext } from 'hono/ws';
+import type { TaskProgress } from '../types/DeezerTypes';
+
+const WS_OPEN = 1;
 
 export class DeezerTaskProgressService {
   private readonly taskProgressStore = new Map<string, TaskProgress>();
 
-  public registerWebSocketForTask(taskId: string, ws: WebSocket): void {
+  public registerWebSocketForTask(taskId: string, ws: WSContext): void {
     let task = this.taskProgressStore.get(taskId);
 
     if (!task) {
@@ -15,7 +17,7 @@ export class DeezerTaskProgressService {
         percentage: 0,
         currentSong: 0,
         totalSongs: 0,
-        webSocketClients: []
+        webSocketClients: [],
       };
       this.taskProgressStore.set(taskId, task);
     }
@@ -27,18 +29,15 @@ export class DeezerTaskProgressService {
     }
   }
 
-  public unregisterWebSocketForTask(taskId: string, ws: WebSocket): void {
+  public unregisterWebSocketForTask(taskId: string, ws: WSContext): void {
     const task = this.taskProgressStore.get(taskId);
 
     if (task) {
-      task.webSocketClients = task.webSocketClients.filter(client => client !== ws);
+      task.webSocketClients = task.webSocketClients.filter((client) => client !== ws);
     }
   }
 
-  public updateTaskProgress(
-    taskId: string,
-    data: Partial<Omit<TaskProgress, 'webSocketClients'>>
-  ): void {
+  public updateTaskProgress(taskId: string, data: Partial<Omit<TaskProgress, 'webSocketClients'>>): void {
     const task = this.taskProgressStore.get(taskId);
 
     if (task) {
@@ -46,8 +45,8 @@ export class DeezerTaskProgressService {
       this.taskProgressStore.set(taskId, updatedTask);
 
       // Send update to all active WebSocket clients for this task
-      task.webSocketClients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) { // Only send if connection is open
+      task.webSocketClients.forEach((client) => {
+        if (client.readyState === WS_OPEN) {
           try {
             client.send(JSON.stringify(updatedTask));
           } catch (sendError) {
@@ -58,12 +57,12 @@ export class DeezerTaskProgressService {
 
       // If task is completed or errors, close WebSocket connections for this task
       if (updatedTask.status === 'completed' || updatedTask.status === 'error') {
-        task.webSocketClients.forEach(client => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.close(1000, 'Task completed'); // 1000: Normal Closure
+        task.webSocketClients.forEach((client) => {
+          if (client.readyState === WS_OPEN) {
+            client.close(1000, 'Task completed');
           }
         });
-        task.webSocketClients = []; // Clear clients after closing
+        task.webSocketClients = [];
       }
     }
   }
@@ -82,4 +81,4 @@ export class DeezerTaskProgressService {
 }
 
 const deezerTaskProgressService = new DeezerTaskProgressService();
-export default deezerTaskProgressService; 
+export default deezerTaskProgressService;

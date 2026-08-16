@@ -1,7 +1,7 @@
-import PlumeMessageResolver from '@lib/plume-messages/MessageResolver';
-import { HttpError } from 'simple-http-rest-client';
+import type PlumeMessageResolver from '@lib/plume-messages/MessageResolver';
+import type { HttpError } from 'simple-http-rest-client';
 import { Logger } from 'simple-logging-system';
-import { Translations } from '../../translations/Translations';
+import type { Translations } from '../../translations/Translations';
 import MessageService from '../MessageService';
 
 type KeyFunction = (...messageArgs: string[]) => string;
@@ -13,8 +13,7 @@ const logger: Logger = new Logger('MessageResolver');
  * It allows to expose the message handling API in the Plume administration theme components
  */
 export default class MessageResolver implements PlumeMessageResolver {
-  constructor(private readonly messages: Translations) {
-  }
+  constructor(private readonly messages: Translations) {}
 
   /**
    * This function reads a message key like 'tree.node.message_key'
@@ -25,7 +24,8 @@ export default class MessageResolver implements PlumeMessageResolver {
    * @param messageArgs: the potentials arguments of the message
    */
   private messageResolver = (messageKey: string, ...messageArgs: string[]): string => {
-    const translation: Translations = messageKey.split('.')
+    const translation: Translations = messageKey
+      .split('.')
       // Enables to find the message value in a object (e.g `{a: {b: {c: value}}}` with a string key (e.g `a.b.c`)
       .reduce(
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

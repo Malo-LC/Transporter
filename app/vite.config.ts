@@ -1,4 +1,4 @@
-import { Options } from '@swc/core';
+import type { Options } from '@swc/core';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { defineConfig } from 'vite';
@@ -39,7 +39,7 @@ export default defineConfig({
     },
     preprocessorOptions: {
       scss: {
-        additionalData: '@use \'@scssVariables\' as *;',
+        additionalData: "@use '@scssVariables' as *;",
       },
     },
   },

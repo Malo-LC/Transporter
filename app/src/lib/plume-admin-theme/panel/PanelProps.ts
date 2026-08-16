@@ -1,23 +1,23 @@
-import { PropsWithChildren } from 'react';
-import { Link } from 'type-route';
+import type { PropsWithChildren } from 'react';
+import type { Link } from 'type-route';
 
 export type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export type PanelContentElementProps = PropsWithChildren<{
-  columns: number,
-  className?: string,
+  columns: number;
+  className?: string;
 }>;
 
 export type PanelContentElementColumnProps = PropsWithChildren<{
-  width: number,
-  className?: string,
+  width: number;
+  className?: string;
 }>;
 
 export type PanelProps = PropsWithChildren<{
-  className?: string,
+  className?: string;
 }>;
 
 export type PanelTitleProps = PropsWithChildren<{
-  level?: HeadingLevel,
-  backRoute?: Link,
+  level?: HeadingLevel;
+  backRoute?: Link;
 }>;

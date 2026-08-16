@@ -1,4 +1,4 @@
 export type SpotifyAuth = {
-  isAuthenticated: boolean,
-  userId: string,
+  isAuthenticated: boolean;
+  userId: string;
 };

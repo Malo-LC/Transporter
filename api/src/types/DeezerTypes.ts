@@ -1,4 +1,4 @@
-import { WebSocket } from 'ws';
+import type { WSContext } from 'hono/ws';
 
 export type DeezerTrack = {
   id: number;
@@ -7,8 +7,8 @@ export type DeezerTrack = {
   title_short: string;
   title_version: string;
   isrc: string;
-  duration: number
-  rank: number
+  duration: number;
+  rank: number;
   explicit_lyrics: boolean;
   explicit_content_lyrics: number;
   explicit_content_cover: number;
@@ -64,12 +64,12 @@ export type TrackData = {
   trackName: string;
   artistName: string;
   albumName: string;
-}
+};
 
 export type CsvFileData = {
   tracks: TrackData[];
   playlistName: string;
-}
+};
 
 export type TaskProgress = {
   status: 'pending' | 'transferring' | 'completed' | 'error';
@@ -80,5 +80,5 @@ export type TaskProgress = {
   missingTracks?: string[];
   timeTaken?: number;
   songName?: string;
-  webSocketClients: WebSocket[];
+  webSocketClients: WSContext[];
 };

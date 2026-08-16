@@ -1,19 +1,18 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Logger } from 'simple-logging-system';
 
 const logger: Logger = new Logger('GlobalErrorBoundary');
 
 type GlobalErrorBoundaryProps = {
-  children: ReactNode,
+  children: ReactNode;
 };
 
 type GlobalErrorBoundaryState = {
-  error?: Error,
-  errorInfo?: ErrorInfo,
+  error?: Error;
+  errorInfo?: ErrorInfo;
 };
 
-export default class GlobalErrorBoundary
-  extends Component<GlobalErrorBoundaryProps, GlobalErrorBoundaryState> {
+export default class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, GlobalErrorBoundaryState> {
   constructor(props: GlobalErrorBoundaryProps) {
     super(props);
     this.state = { error: undefined, errorInfo: undefined };
@@ -24,10 +23,7 @@ export default class GlobalErrorBoundary
       error,
       errorInfo,
     });
-    logger.error(
-      `${error.name}: ${error.message}`,
-      { stack: error.stack, componentStack: errorInfo.componentStack },
-    );
+    logger.error(`${error.name}: ${error.message}`, { stack: error.stack, componentStack: errorInfo.componentStack });
   }
 
   render() {

@@ -1,2 +1,13 @@
 .idea/*
 /.vscode
+node_modules/
+dist/
+build/
+coverage/
+.pnp.*
+.yarn/
+*.log
+.env
+.env.*
+!.env.example
+bun.lockb

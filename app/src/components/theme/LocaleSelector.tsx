@@ -1,16 +1,14 @@
-import { Locale } from '@lib/locale-resolver/LocaleResolver';
+import type { Locale } from '@lib/locale-resolver/LocaleResolver';
 import { MenuItem } from '@mui/material';
 import DropdownMenu, { useOnClickSubscriber } from './DropdownMenu';
 
 type LocaleSelectorProps = {
-  currentLocale: Locale,
-  availableLocales: Locale[],
-  onLocaleSelected: (locale: Locale) => void,
+  currentLocale: Locale;
+  availableLocales: Locale[];
+  onLocaleSelected: (locale: Locale) => void;
 };
 
-export default function LocaleSelector(
-  { currentLocale, availableLocales, onLocaleSelected }: LocaleSelectorProps,
-) {
+export default function LocaleSelector({ currentLocale, availableLocales, onLocaleSelected }: LocaleSelectorProps) {
   const { subscribeOnClick, wrapOnClick } = useOnClickSubscriber();
 
   return (
@@ -19,16 +17,14 @@ export default function LocaleSelector(
       id="lang-menu"
       subscribeOnClick={subscribeOnClick}
     >
-      {
-        availableLocales.map((availableLocale: Locale) => (
-          <MenuItem
-            key={availableLocale.code}
-            onClick={wrapOnClick(() => onLocaleSelected(availableLocale))}
-          >
-            {availableLocale.name}
-          </MenuItem>
-        ))
-      }
+      {availableLocales.map((availableLocale: Locale) => (
+        <MenuItem
+          key={availableLocale.code}
+          onClick={wrapOnClick(() => onLocaleSelected(availableLocale))}
+        >
+          {availableLocale.name}
+        </MenuItem>
+      ))}
     </DropdownMenu>
   );
 }

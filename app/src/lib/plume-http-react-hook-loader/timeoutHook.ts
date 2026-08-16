@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 /**
  * Enable to control the timeout in the component where it is used.
@@ -8,11 +8,11 @@ export type TimeoutController = {
   /**
    * Stop and restart the timeout
    */
-  restartTimeout: () => void,
+  restartTimeout: () => void;
   /**
    * Stop the timeout
    */
-  stopTimeout: () => void,
+  stopTimeout: () => void;
 };
 
 type TimeoutType = ReturnType<typeof setTimeout>;

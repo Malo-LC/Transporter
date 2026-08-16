@@ -1,18 +1,9 @@
-import { InputPasswordProps } from '@lib/plume-admin-theme/form/FormInputProps';
+import type { InputPasswordProps } from '@lib/plume-admin-theme/form/FormInputProps';
 import useToggle from '@lib/react-hook-toggle/ReactHookToggle';
 import { Icon, IconButton, InputAdornment } from '@mui/material';
 import InputText from './InputText';
 
-function InputPassword(
-  {
-    label,
-    name,
-    rules,
-    autoComplete,
-    errorMessageMapping,
-    InputProps,
-  }: Readonly<InputPasswordProps>,
-) {
+function InputPassword({ label, name, rules, autoComplete, errorMessageMapping, InputProps }: Readonly<InputPasswordProps>) {
   const [showPassword, toggleShowPassword] = useToggle(false);
   return (
     <InputText
@@ -22,28 +13,22 @@ function InputPassword(
       autoComplete={autoComplete}
       rules={rules}
       errorMessageMapping={errorMessageMapping}
-      InputProps={
-        {
-          ...InputProps,
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={toggleShowPassword}
-                onTouchStart={toggleShowPassword}
-                onTouchEnd={toggleShowPassword}
-                onMouseDown={toggleShowPassword}
-              >
-                {
-                  showPassword
-                    ? <Icon>visibility_off</Icon>
-                    : <Icon>visibility</Icon>
-                }
-              </IconButton>
-            </InputAdornment>
-          ),
-        }
-      }
+      InputProps={{
+        ...InputProps,
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton
+              aria-label="toggle password visibility"
+              onClick={toggleShowPassword}
+              onTouchStart={toggleShowPassword}
+              onTouchEnd={toggleShowPassword}
+              onMouseDown={toggleShowPassword}
+            >
+              {showPassword ? <Icon>visibility_off</Icon> : <Icon>visibility</Icon>}
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
     />
   );
 }

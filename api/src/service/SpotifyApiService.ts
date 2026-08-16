@@ -1,18 +1,12 @@
 import ky, { type KyInstance } from 'ky';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI } from '../config';
-import {
-  AddItemsToPlaylistResponse,
-  SpotifyPlaylist,
-  SpotifyRefreshToken,
-  SpotifySearchResponse,
-  SpotifyUser
-} from '../types/SpotifyTypes';
+import type { AddItemsToPlaylistResponse, SpotifyPlaylist, SpotifyRefreshToken, SpotifySearchResponse, SpotifyUser } from '../types/SpotifyTypes';
 
 type Token = {
   accessToken: string;
   refreshToken: string;
   expiresAt: number;
-}
+};
 
 class SpotifyApiService {
   private readonly baseUrl: string = 'https://api.spotify.com/v1/';
@@ -29,12 +23,7 @@ class SpotifyApiService {
     });
   }
 
-  public async createPlaylist(
-    userId: string,
-    name: string,
-    description: string = '',
-    isPublic: boolean = true,
-  ): Promise<SpotifyPlaylist> {
+  public async createPlaylist(userId: string, name: string, description: string = '', isPublic: boolean = true): Promise<SpotifyPlaylist> {
     const client = await this.getClientForUser(userId);
 
     const playlistData = {
@@ -43,16 +32,10 @@ class SpotifyApiService {
       public: isPublic,
     };
 
-    return client
-      .post(`users/${userId}/playlists`, { json: playlistData })
-      .json<SpotifyPlaylist>();
+    return client.post(`users/${userId}/playlists`, { json: playlistData }).json<SpotifyPlaylist>();
   }
 
-  public async addSongsToPlaylist(
-    userId: string,
-    playlistId: string,
-    trackUris: string[],
-  ): Promise<AddItemsToPlaylistResponse> {
+  public async addSongsToPlaylist(userId: string, playlistId: string, trackUris: string[]): Promise<AddItemsToPlaylistResponse> {
     const client = await this.getClientForUser(userId);
 
     if (!trackUris || trackUris.length === 0) {
@@ -60,24 +43,19 @@ class SpotifyApiService {
     }
 
     if (trackUris.length > 100) {
-      throw new Error('Tentative d\'ajout de plus de 100 pistes à la fois. L\'API Spotify pourrait rejeter la requête ou ne traiter que les 100 premières. Envisagez de diviser la requête.');
+      throw new Error(
+        "Tentative d'ajout de plus de 100 pistes à la fois. L'API Spotify pourrait rejeter la requête ou ne traiter que les 100 premières. Envisagez de diviser la requête.",
+      );
     }
 
     const data = {
       uris: trackUris,
     };
 
-    return client
-      .post(`playlists/${playlistId}/tracks`, { json: data })
-      .json<AddItemsToPlaylistResponse>();
+    return client.post(`playlists/${playlistId}/tracks`, { json: data }).json<AddItemsToPlaylistResponse>();
   }
 
-  public async searchTrack(
-    userId: string,
-    songName: string,
-    artistName: string,
-    albumName?: string,
-  ): Promise<SpotifySearchResponse> {
+  public async searchTrack(userId: string, songName: string, artistName: string, albumName?: string): Promise<SpotifySearchResponse> {
     const client = await this.getClientForUser(userId);
     let query = `track:${songName.trim()}`;
 
@@ -95,15 +73,10 @@ class SpotifyApiService {
       limit: '1',
     });
 
-    return client
-      .get('search', { searchParams })
-      .json<SpotifySearchResponse>();
+    return client.get('search', { searchParams }).json<SpotifySearchResponse>();
   }
 
-  public async addItemsToLikedTracks(
-    userId: string,
-    trackUris: string[],
-  ): Promise<AddItemsToPlaylistResponse> {
+  public async addItemsToLikedTracks(userId: string, trackUris: string[]): Promise<AddItemsToPlaylistResponse> {
     const client = await this.getClientForUser(userId);
 
     if (!trackUris || trackUris.length === 0) {
@@ -111,16 +84,16 @@ class SpotifyApiService {
     }
 
     if (trackUris.length > 50) {
-      throw new Error('Tentative d\'ajout de plus de 50 pistes à la fois. L\'API Spotify pourrait rejeter la requête ou ne traiter que les 50 premières. Envisagez de diviser la requête.');
+      throw new Error(
+        "Tentative d'ajout de plus de 50 pistes à la fois. L'API Spotify pourrait rejeter la requête ou ne traiter que les 50 premières. Envisagez de diviser la requête.",
+      );
     }
 
     const data = {
       ids: trackUris,
     };
 
-    return client
-      .put('me/tracks', { json: data })
-      .json<AddItemsToPlaylistResponse>();
+    return client.put('me/tracks', { json: data }).json<AddItemsToPlaylistResponse>();
   }
 
   // Token management
@@ -144,7 +117,7 @@ class SpotifyApiService {
 
     return this.client.extend({
       headers: {
-        'Authorization': `Bearer ${token.accessToken}`,
+        Authorization: `Bearer ${token.accessToken}`,
       },
     });
   }
@@ -168,22 +141,24 @@ class SpotifyApiService {
   public async fetchAndSetAccessToken(code: string): Promise<string> {
     const basicAuth = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64');
 
-    const tokenResponse = await ky.post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${basicAuth}`,
-      },
-      searchParams: {
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: this.redirectUri,
-      }
-    }).json();
+    const tokenResponse = await ky
+      .post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${basicAuth}`,
+        },
+        searchParams: {
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: this.redirectUri,
+        },
+      })
+      .json();
 
     // Temporarily use the new token to fetch user ID
     const tempClient = this.client.extend({
       headers: {
-        'Authorization': `Bearer ${tokenResponse.access_token}`,
+        Authorization: `Bearer ${tokenResponse.access_token}`,
       },
     });
 
@@ -199,16 +174,18 @@ class SpotifyApiService {
   }
 
   public async refreshAccessToken(refreshToken: string): Promise<Token> {
-    const tokenResponse = await ky.post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      searchParams: {
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-        client_id: SPOTIFY_CLIENT_ID,
-      }
-    }).json();
+    const tokenResponse = await ky
+      .post<SpotifyRefreshToken>('https://accounts.spotify.com/api/token', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        searchParams: {
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+          client_id: SPOTIFY_CLIENT_ID,
+        },
+      })
+      .json();
 
     return {
       accessToken: tokenResponse.access_token,

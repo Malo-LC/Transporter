@@ -3,12 +3,12 @@ export type SpotifyRefreshToken = {
   token_type: string;
   refresh_token: string;
   expires_in: number;
-}
+};
 
 export type SpotifyUser = {
   id: string;
   display_name?: string;
-}
+};
 
 export type SpotifyPlaylist = {
   id: string;
@@ -20,11 +20,11 @@ export type SpotifyPlaylist = {
   tracks: {
     total: number;
   };
-}
+};
 
 export type AddItemsToPlaylistResponse = {
   snapshot_id: string;
-}
+};
 
 export type SpotifyTrack = {
   id: string;
@@ -45,7 +45,7 @@ export type SpotifySearchResponse = {
 };
 
 export type SearchTrackRequest = {
-  songName: string,
-  artistName: string,
-  albumName: string,
-}
+  songName: string;
+  artistName: string;
+  albumName: string;
+};

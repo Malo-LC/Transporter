@@ -1,8 +1,10 @@
-import { MessageResolver } from '@lib/plume-messages/MessageResolver';
-import { FieldError } from 'react-hook-form';
+import type { MessageResolver } from '@lib/plume-messages/MessageResolver';
+import type { FieldError } from 'react-hook-form';
 
 export function formErrorToMessage(
-  messageResolver: MessageResolver, error: FieldError, errorMapping?: (error: FieldError) => string | undefined,
+  messageResolver: MessageResolver,
+  error: FieldError,
+  errorMapping?: (error: FieldError) => string | undefined,
 ): string {
   if (errorMapping) {
     const errorMappingMessage: string | undefined = errorMapping(error);

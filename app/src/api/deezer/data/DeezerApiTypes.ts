@@ -1,7 +1,7 @@
 export type DeezerExportBody = {
-  playlistUrl: string,
+  playlistUrl: string;
 };
 
 export type DeezerStartExport = {
-  taskId: string,
+  taskId: string;
 };

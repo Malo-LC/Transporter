@@ -1,6 +1,6 @@
-import { RefObject, useRef } from 'react';
+import { type RefObject, useRef } from 'react';
 import { useOnComponentUnMounted } from '../react-hooks-alias/ReactHooksAlias';
-import { AnyPromise } from './AnyPromise';
+import type { AnyPromise } from './AnyPromise';
 
 /**
  * Function calls when the {@link Promise} resolution happens after the component has been unmounted.
@@ -11,7 +11,7 @@ export interface OnUnmountedResolution<T, E> {
    * @param thenResult Contains the result if the {@link Promise} has succeeded
    * @param catchResult Contains the error if the {@link Promise} has failed
    */
-  (thenResult?: T, catchResult?: E): void,
+  (thenResult?: T, catchResult?: E): void;
 }
 
 /**
@@ -20,12 +20,10 @@ export interface OnUnmountedResolution<T, E> {
  * if the component has been unmounted.
  * See {@link useUnmountablePromises}
  */
-export interface StopPromisePropagationAfterUnmount {
-  <T, E>(
-    promise: AnyPromise<T, E>,
-    onUnmountedResolution?: OnUnmountedResolution<T, E>,
-  ): AnyPromise<T, E>,
-}
+export type StopPromisePropagationAfterUnmount = <T, E>(
+  promise: AnyPromise<T, E>,
+  onUnmountedResolution?: OnUnmountedResolution<T, E>,
+) => AnyPromise<T, E>;
 
 /**
  * Hook used to avoid making actions after the component is unmounted and the {@link Promise} resolves.
@@ -56,7 +54,7 @@ export default function useUnmountablePromises(): StopPromisePropagationAfterUnm
     isMountedRef.current = false;
   });
 
-  return <T, E>(promise: AnyPromise<T, E>, onUnmountedResolution?: OnUnmountedResolution<T, E>): AnyPromise<T, E> => (
+  return <T, E>(promise: AnyPromise<T, E>, onUnmountedResolution?: OnUnmountedResolution<T, E>): AnyPromise<T, E> =>
     // the idea is to not resolve or reject the Promise in case the component is not Mounted anymore
     new Promise<T>((resolve: (result: T) => void, reject: (error: E) => void) => {
       promise
@@ -74,6 +72,5 @@ export default function useUnmountablePromises(): StopPromisePropagationAfterUnm
             onUnmountedResolution?.(undefined, error);
           }
         });
-    })
-  );
+    });
 }

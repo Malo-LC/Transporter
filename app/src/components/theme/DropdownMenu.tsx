@@ -1,13 +1,13 @@
 import { Button, Icon, Menu } from '@mui/material';
-import { ReactNode, useState } from 'react';
-import { IconType } from './IconType';
+import { type ReactNode, useState } from 'react';
+import type { IconType } from './IconType';
 
 export type DropdownMenuType = {
-  icon?: IconType,
-  label: string,
-  id: string,
-  subscribeOnClick?: (onClick: () => void) => void,
-  children?: ReactNode,
+  icon?: IconType;
+  label: string;
+  id: string;
+  subscribeOnClick?: (onClick: () => void) => void;
+  children?: ReactNode;
 };
 
 /**
@@ -42,9 +42,7 @@ export function useOnClickSubscriber() {
  if the dropdown menu should collapse when an item is clicked
  * @param children The MenuItem children
  */
-export default function DropdownMenu({
-  id, icon, label, subscribeOnClick, children,
-}: DropdownMenuType) {
+export default function DropdownMenu({ id, icon, label, subscribeOnClick, children }: DropdownMenuType) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -67,14 +65,7 @@ export default function DropdownMenu({
         onClick={handleClick}
         endIcon={<Icon>expand_more</Icon>}
       >
-        {
-          icon
-          && (
-            <Icon>
-              {icon}
-            </Icon>
-          )
-        }
+        {icon && <Icon>{icon}</Icon>}
         {label}
       </Button>
       <Menu

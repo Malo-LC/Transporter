@@ -1,7 +1,7 @@
 import Home from '@components/features/Home';
 import SpotifyCallback from '@components/features/SpotifyCallback';
-import { JSX, useMemo } from 'react';
-import { ROUTE_HOME, SPOTIFY_CALLBACK, useRoute, UseRoute } from './RouterDefinition';
+import { type JSX, useMemo } from 'react';
+import { ROUTE_HOME, SPOTIFY_CALLBACK, type UseRoute, useRoute } from './RouterDefinition';
 
 export default function useActiveAuthenticatedRouteComponent(): JSX.Element | null {
   const route: UseRoute = useRoute();
@@ -11,7 +11,12 @@ export default function useActiveAuthenticatedRouteComponent(): JSX.Element | nu
       return <Home />;
     }
     if (route.name === SPOTIFY_CALLBACK) {
-      return <SpotifyCallback code={route.params.code} error={route.params.error} />;
+      return (
+        <SpotifyCallback
+          code={route.params.code}
+          error={route.params.error}
+        />
+      );
     }
     return null;
   }, [route.name]);

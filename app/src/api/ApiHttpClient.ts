@@ -1,10 +1,10 @@
-import { HttpMethod, HttpRequest, MultipartHttpRequest } from 'simple-http-request-builder';
+import type { HttpMethod, HttpRequest, MultipartHttpRequest } from 'simple-http-request-builder';
 import {
   createHttpFetchRequest,
   createMultipartHttpFetchRequest,
   defaultJsonFetchClient,
   fetchClient,
-  HttpPromise,
+  type HttpPromise,
   multipartHttpFetchClient,
 } from 'simple-http-rest-client';
 

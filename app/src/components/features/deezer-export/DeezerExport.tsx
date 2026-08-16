@@ -1,26 +1,26 @@
-import { DeezerStartExport } from '@api/deezer/data/DeezerApiTypes';
 import DeezerApi from '@api/deezer/DeezerApi';
+import type { DeezerStartExport } from '@api/deezer/data/DeezerApiTypes';
 import TransferProgressDisplay from '@components/features/deezer-export/TransferProgressDisplay';
 import { ActionButton } from '@components/theme/action/Actions';
 import InputText from '@components/theme/form/fields/InputText';
-import useMessages, { Messages } from '@i18n/hooks/messagesHook';
-import useLoader, { LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
+import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
+import useLoader, { type LoaderState } from '@lib/plume-http-react-hook-loader/promiseLoaderHook';
 import useNotification from '@lib/plume-notification/NotificationHook';
 import { Checkbox } from '@mui/material';
 import { getGlobalInstance } from 'plume-ts-di';
-import { FieldError, useForm, UseFormReturn } from 'react-hook-form';
+import { type FieldError, type UseFormReturn, useForm } from 'react-hook-form';
 import { FormContainer } from 'react-hook-form-mui';
 import CustomFileInput from '../../theme/form/fields/CustomFileInput';
 import scss from './deezer-export.module.scss';
 import { useExportProgress } from './useExportProgress';
 
 export type FormValues = {
-  file: File | undefined,
-  playlistUrl: string,
-  playlistName: string,
-  isLikes: boolean,
-  description?: string,
-  isPublic?: boolean,
+  file: File | undefined;
+  playlistUrl: string;
+  playlistName: string;
+  isLikes: boolean;
+  description?: string;
+  isPublic?: boolean;
 };
 
 // ProgressData type is now imported from useExportProgress
@@ -34,11 +34,7 @@ export function DeezerExport() {
 
   const formContext: UseFormReturn<FormValues> = useForm<FormValues>();
 
-  const {
-    transferProgress,
-    startWebSocketConnection,
-    closeWebSocket,
-  } = useExportProgress();
+  const { transferProgress, startWebSocketConnection, closeWebSocket } = useExportProgress();
 
   const onSubmit = (data: FormValues) => {
     const { file, playlistUrl } = data;
@@ -82,10 +78,17 @@ export function DeezerExport() {
       <h2>{messages.deezer.title}</h2>
       <div>{messages.deezer.chooseExportMethod}</div>
       <div>{messages.deezer.description}</div>
-      <a href={messages.deezer.exportSite} target="_blank" rel="noopener noreferrer">
+      <a
+        href={messages.deezer.exportSite}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {messages.deezer.exportSite}
       </a>
-      <FormContainer formContext={formContext} onSuccess={onSubmit}>
+      <FormContainer
+        formContext={formContext}
+        onSuccess={onSubmit}
+      >
         <CustomFileInput
           setValue={(value: File | undefined) => formContext.setValue('file', value)}
           value={formContext.watch('file')}
@@ -124,18 +127,10 @@ export function DeezerExport() {
             id="isLikesCheckbox"
           />
         </div>
-        <ActionButton
-          disabled={
-            loader.isLoading
-            || (transferProgress?.status === 'pending' || transferProgress?.status === 'transferring')
-          }
-        >
-          {
-            loader.isLoading
-            || (transferProgress?.status === 'pending' || transferProgress?.status === 'transferring')
-              ? messages.deezer.exporting
-              : messages.deezer.export
-          }
+        <ActionButton disabled={loader.isLoading || transferProgress?.status === 'pending' || transferProgress?.status === 'transferring'}>
+          {loader.isLoading || transferProgress?.status === 'pending' || transferProgress?.status === 'transferring'
+            ? messages.deezer.exporting
+            : messages.deezer.export}
         </ActionButton>
         <TransferProgressDisplay
           transferProgress={transferProgress}

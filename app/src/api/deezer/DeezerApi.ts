@@ -1,20 +1,19 @@
-import { DeezerStartExport } from '@api/deezer/data/DeezerApiTypes';
-import { FormValues } from '@components/features/deezer-export/DeezerExport';
+import type { DeezerStartExport } from '@api/deezer/data/DeezerApiTypes';
+import type { FormValues } from '@components/features/deezer-export/DeezerExport';
 import { HttpMethod } from 'simple-http-request-builder';
-import { HttpPromise } from 'simple-http-rest-client';
-import ApiHttpClient from '../ApiHttpClient';
+import type { HttpPromise } from 'simple-http-rest-client';
+import type ApiHttpClient from '../ApiHttpClient';
 
 export default class DeezerApi {
-  constructor(private readonly httpClient: ApiHttpClient) {
-  }
+  constructor(private readonly httpClient: ApiHttpClient) {}
 
   exportByPlaylistId(data: FormValues): HttpPromise<DeezerStartExport> {
     // This now initiates the task and gets the taskId
-    return this
-      .httpClient
+    return this.httpClient
       .restRequest<DeezerStartExport>(HttpMethod.POST, `/deezer/start-playlist-export`)
       .jsonBody({
-        playlistUrl: data.playlistUrl, name: data.playlistName,
+        playlistUrl: data.playlistUrl,
+        name: data.playlistName,
         // description: data.description,
         // public: data.isPublic,
         isLikes: data.isLikes,
@@ -31,10 +30,12 @@ export default class DeezerApi {
   // --- End Modified for WebSocket ---
 
   exportByFile(data: FormValues): HttpPromise<DeezerStartExport> {
-    return this
-      .httpClient
+    return this.httpClient
       .multipartRequest<DeezerStartExport>(HttpMethod.POST, '/deezer/file')
-      .data([['file', data.file], ['name', data.playlistName]])
+      .data([
+        ['file', data.file],
+        ['name', data.playlistName],
+      ])
       .execute();
   }
 }

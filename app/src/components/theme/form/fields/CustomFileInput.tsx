@@ -1,37 +1,23 @@
-import useMessages, { Messages } from '@i18n/hooks/messagesHook';
+import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
 import classNames from '@lib/class-names/ClassNames';
 import ClearIcon from '@mui/icons-material/Clear';
-import { ChangeEvent, MouseEvent } from 'react';
+import type { ChangeEvent, MouseEvent } from 'react';
 import scss from './custom-file-input.module.scss';
 
 type CustomFileInputProps = {
-  value: File | undefined,
-  setValue: (value: File | undefined) => void,
+  value: File | undefined;
+  setValue: (value: File | undefined) => void;
 };
 
-export default function CustomFileInput(
-  {
-    value,
-    setValue,
-  }: Readonly<CustomFileInputProps>,
-) {
+export default function CustomFileInput({ value, setValue }: Readonly<CustomFileInputProps>) {
   const { messages }: Messages = useMessages();
 
   return (
     <label
-      className={classNames(
-        scss.customFileUpload,
-        value ? scss.customFileUploadSelected : '',
-      )}
+      className={classNames(scss.customFileUpload, value ? scss.customFileUploadSelected : '')}
       htmlFor="file"
     >
-      <span>
-        {
-          value
-            ? value?.name
-            : messages.deezer.exportByFile
-        }
-      </span>
+      <span>{value ? value?.name : messages.deezer.exportByFile}</span>
       <input
         type="file"
         id="file"
@@ -41,18 +27,16 @@ export default function CustomFileInput(
           setValue(file);
         }}
       />
-      {
-        value && (
-          <ClearIcon
-            onClick={(e: MouseEvent<SVGSVGElement>) => {
-              setValue(undefined);
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            className={scss.customFileUploadClear}
-          />
-        )
-      }
+      {value && (
+        <ClearIcon
+          onClick={(e: MouseEvent<SVGSVGElement>) => {
+            setValue(undefined);
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          className={scss.customFileUploadClear}
+        />
+      )}
     </label>
   );
 }

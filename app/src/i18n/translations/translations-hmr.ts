@@ -1,6 +1,6 @@
-import { WritableObservable } from 'micro-observables';
-import { ModuleNamespace } from 'vite/types/hot';
-import { Translations } from './Translations';
+import type { WritableObservable } from 'micro-observables';
+import type { ModuleNamespace } from 'vite/types/hot';
+import type { Translations } from './Translations';
 
 // Development hot reloading handling, see https://vitejs.dev/guide/api-hmr.html
 // Every time a translation file changes,
@@ -12,12 +12,10 @@ import { Translations } from './Translations';
 export default function translationHotReload(messagesObservable: WritableObservable<Translations>) {
   return (newModule: ModuleNamespace | undefined) => {
     if (newModule) {
-      const moduleTranslations: WritableObservable<Translations> = newModule
-        .default as unknown as WritableObservable<Translations>;
+      const moduleTranslations: WritableObservable<Translations> = newModule.default as unknown as WritableObservable<Translations>;
       const updatedTranslations: Translations = moduleTranslations.get();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const baseObservable: WritableObservable<Translations> = (messagesObservable.get() as any)
-        .originalMessageObservable ?? messagesObservable;
+      const baseObservable: WritableObservable<Translations> = (messagesObservable.get() as any).originalMessageObservable ?? messagesObservable;
       const translationsWithObservable: object = {
         ...updatedTranslations,
         originalMessageObservable: baseObservable,

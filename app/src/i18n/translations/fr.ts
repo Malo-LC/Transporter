@@ -1,7 +1,7 @@
 /* eslint-disable @stylistic/max-len */
 import { viteHotContext } from '@i18n/translations/hmr-config';
-import { observable, WritableObservable } from 'micro-observables';
-import { Translations } from './Translations';
+import { observable, type WritableObservable } from 'micro-observables';
+import type { Translations } from './Translations';
 import translationHotReload from './translations-hmr';
 
 const frMessages: Translations = {
@@ -25,7 +25,7 @@ const frMessages: Translations = {
   },
   // common labels
   label: {
-    more_options: 'Plus d\'options',
+    more_options: "Plus d'options",
     confirm_delete: 'Confirmation de suppression',
     creation_date: 'Date de création',
     empty: 'Aucun élément',
@@ -34,8 +34,8 @@ const frMessages: Translations = {
   // common messages
   message: {
     changes_saved: 'Les modifications ont bien été enregistrées',
-    unsaved_data: 'Des modifications n\'ont pas été enregistrées. '
-      + 'Si vous voulez enregistrer ces modifications, cliquez sur le bouton "Rester sur la page"',
+    unsaved_data:
+      "Des modifications n'ont pas été enregistrées. " + 'Si vous voulez enregistrer ces modifications, cliquez sur le bouton "Rester sur la page"',
   },
   // navigation
   nav: {
@@ -45,16 +45,16 @@ const frMessages: Translations = {
   },
   // home
   home: {
-    title: 'Page d\'accueil',
-    description: 'Bienvenue sur la page d\'accueil de l\'application de transfert de playlists Deezer vers Spotify.',
+    title: "Page d'accueil",
+    description: "Bienvenue sur la page d'accueil de l'application de transfert de playlists Deezer vers Spotify.",
     loginToSpotify: 'Se connecter à Spotify',
   },
   deezer: {
-    chooseExportMethod: 'Veuillez choisir une méthode d\'exportation',
-    description: 'Si votre playlist contient plus de 2000 titres, il faut l\'exporter par fichier au format CSV grâce au site suivant :',
+    chooseExportMethod: "Veuillez choisir une méthode d'exportation",
+    description: "Si votre playlist contient plus de 2000 titres, il faut l'exporter par fichier au format CSV grâce au site suivant :",
     export: 'Exporter',
     exportByFile: 'Exporter par fichier',
-    exportByUrl: 'Sinon, vous pouvez entrer l\'url de votre playlist Deezer ci-dessous :',
+    exportByUrl: "Sinon, vous pouvez entrer l'url de votre playlist Deezer ci-dessous :",
     exportSite: 'https://www.tunemymusic.com/fr/transfer',
     exporting: 'Exportation en cours...',
     isLikes: 'Ajouter les titres à la playlist "J\'aime" ?',
@@ -70,7 +70,7 @@ const frMessages: Translations = {
   spotify: {
     error: (error: string) => `Erreur de connexion à Spotify : ${error}`,
     success: 'Authentification Spotify réussie',
-    noCode: 'Aucun code fourni dans l\'URL',
+    noCode: "Aucun code fourni dans l'URL",
     callback: 'Authentification Spotify en cours, veuillez patienter...',
     connectedAs: (userId: string | undefined) => `Connecté en tant que : ${userId}`,
   },
@@ -79,7 +79,7 @@ const frMessages: Translations = {
   },
   // users
   users: {
-    userName: 'Nom d\'utilisateur',
+    userName: "Nom d'utilisateur",
     password: 'Mot de passe',
     email: 'E-mail',
     firstName: 'Prénom',
@@ -92,8 +92,8 @@ const frMessages: Translations = {
   // pages users
   user: {
     title_list: 'Liste des utilisateurs',
-    title_create: 'Création d\'un utilisateur',
-    title_edit: 'Modification d\'un utilisateur',
+    title_create: "Création d'un utilisateur",
+    title_edit: "Modification d'un utilisateur",
     created: (date: string) => `Créé le ${date}`,
     found: (count: number) => `${count} utilisateur${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''}`,
     add_user: 'Ajouter un utilisateur',
@@ -121,21 +121,23 @@ const frMessages: Translations = {
   error: {
     field: {
       required: 'Le champ est requis',
-      email_wrong_format: 'L\'adresse e-mail saisie semble être incorrecte',
+      email_wrong_format: "L'adresse e-mail saisie semble être incorrecte",
       password_same_value: 'Veuillez saisir deux mots de passe identiques',
       empty_field: 'Le champ entré est vide',
     },
     security: {
-      fingerprint_missing: 'Le fingerprint du cookie pour sécuriser le token JWT semble absent, cela peut être ok en développement, mais en production, ce cookie devra être activé',
+      fingerprint_missing:
+        'Le fingerprint du cookie pour sécuriser le token JWT semble absent, cela peut être ok en développement, mais en production, ce cookie devra être activé',
     },
   },
   'http-errors': {
-    INTERNAL_ERROR: 'Une erreur inattendue s\'est produite',
+    INTERNAL_ERROR: "Une erreur inattendue s'est produite",
     NETWORK_ERROR: 'Erreur réseau, votre connexion internet semble indisponible',
     TIMEOUT_ERROR: 'Erreur réseau (timeout), votre connexion internet ou le serveur distant semble indisponible',
-    FORBIDDEN_ERROR: 'Il semble que vous n\'avez pas accès à cette ressource ou à cette action',
-    WRONG_LOGIN_OR_PASSWORD: 'Nom d\'utilisateur ou mot de passe incorrect',
-    TOO_MANY_WRONG_ATTEMPS: (seconds: string) => `Suite à des erreurs dans la saisie de vos identifiants, votre compte est verrouillé pendant ${seconds} secondes, veuillez-vous reconnecter ultérieurement`,
+    FORBIDDEN_ERROR: "Il semble que vous n'avez pas accès à cette ressource ou à cette action",
+    WRONG_LOGIN_OR_PASSWORD: "Nom d'utilisateur ou mot de passe incorrect",
+    TOO_MANY_WRONG_ATTEMPS: (seconds: string) =>
+      `Suite à des erreurs dans la saisie de vos identifiants, votre compte est verrouillé pendant ${seconds} secondes, veuillez-vous reconnecter ultérieurement`,
     FIELD_REQUIRED: (fieldName: string) => `Le champ '${fieldName}' est requis`,
     MESSAGE: (message: string) => message,
     UNAUTHORIZED: 'Non autorisé',
@@ -145,7 +147,7 @@ const frMessages: Translations = {
     DEEZER_PLAYLIST_PARSING_ERROR: 'Erreur lors de la lecture de la playlist Deezer',
     DEEZER_PLAYLIST_URL_INVALID: 'URL de la playlist Deezer invalide',
     DEEZER_PLAYLIST_NAME_MISSING: 'Le nom de la playlist Deezer est requis',
-    SPOTIFY_ACCESS_TOKEN_MISSING: 'L\'accès à Spotify est requis',
+    SPOTIFY_ACCESS_TOKEN_MISSING: "L'accès à Spotify est requis",
     SPOTIFY_PLAYLIST_CREATION_ERROR: 'Erreur lors de la création de la playlist Spotify',
   },
 } as const;

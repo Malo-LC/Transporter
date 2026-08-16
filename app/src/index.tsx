@@ -10,7 +10,7 @@ import 'micro-observables/batchingForReactDom';
 import installServicesModule from '@services/services-module';
 import { configureGlobalInjector, Injector } from 'plume-ts-di';
 import './polyfill-loader';
-import { JSX } from 'react';
+import type { JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Logger } from 'simple-logging-system';
 
@@ -32,9 +32,7 @@ initializeLocalizedDate(injector.getInstance(LocaleService));
 // notifications display management
 injector.getInstance(NotificationRenderer).initialize();
 
-const reactApp: JSX.Element = (
-  <App />
-);
+const reactApp: JSX.Element = <App />;
 const rootElement: HTMLElement | null = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Failed to find the root element');
