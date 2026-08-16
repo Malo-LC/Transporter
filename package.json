@@ -1,6 +1,6 @@
 {
   "name": "transporter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
     "@semantic-release/changelog": "^7.0.0",
@@ -20,7 +20,10 @@
     "release": "semantic-release"
   },
   "type": "module",
-  "workspaces": ["app", "api"],
+  "workspaces": [
+    "app",
+    "api"
+  ],
   "overrides": {
     "@swc/core": "1.15.10"
   }
