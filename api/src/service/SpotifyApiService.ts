@@ -16,7 +16,7 @@ class SpotifyApiService {
 
   constructor() {
     this.client = ky.create({
-      prefixUrl: this.baseUrl,
+      prefix: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
       },

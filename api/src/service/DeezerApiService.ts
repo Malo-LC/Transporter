@@ -6,7 +6,7 @@ class DeezerApiService {
 
   constructor() {
     this.client = ky.create({
-      prefixUrl: 'https://api.deezer.com/',
+      prefix: 'https://api.deezer.com/',
       searchParams: {
         output: 'json',
         limit: 2000,

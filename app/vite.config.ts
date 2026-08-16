@@ -1,7 +1,13 @@
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import type { Options } from '@swc/core';
 import react from '@vitejs/plugin-react-swc';
-import path from 'path';
 import { defineConfig } from 'vite';
+
+const require = createRequire(import.meta.url);
+const reactPath: string = fs.realpathSync(path.dirname(require.resolve('react/package.json')));
+const reactDomPath: string = fs.realpathSync(path.dirname(require.resolve('react-dom/package.json')));
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -44,7 +50,13 @@ export default defineConfig({
     },
   },
   resolve: {
+    // Vite 8 / Rolldown otherwise pre-bundles two React copies (react.js vs a hashed
+    // chunk used by react-dom/client), which makes hooks throw "Invalid hook call".
+    dedupe: ['react', 'react-dom'],
     alias: {
+      // react-dom must be listed before react: a 'react' alias also matches 'react-dom'.
+      'react-dom': reactDomPath,
+      react: reactPath,
       '@scssVariables': path.resolve(import.meta.dirname, 'assets/scss/variables'),
       '@api': path.resolve(import.meta.dirname, 'src/api'),
       '@components': path.resolve(import.meta.dirname, 'src/components'),
@@ -52,5 +64,8 @@ export default defineConfig({
       '@lib': path.resolve(import.meta.dirname, 'src/lib'),
       '@services': path.resolve(import.meta.dirname, 'src/services'),
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
 });

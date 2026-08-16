@@ -1,5 +1,5 @@
 import type { WritableObservable } from 'micro-observables';
-import type { ModuleNamespace } from 'vite/types/hot';
+import type { ModuleNamespace } from 'vite/types/hot.js';
 import type { Translations } from './Translations';
 
 // Development hot reloading handling, see https://vitejs.dev/guide/api-hmr.html

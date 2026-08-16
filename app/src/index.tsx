@@ -9,7 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'micro-observables/batchingForReactDom';
 import installServicesModule from '@services/services-module';
 import { configureGlobalInjector, Injector } from 'plume-ts-di';
-import './polyfill-loader';
 import type { JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Logger } from 'simple-logging-system';

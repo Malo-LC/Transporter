@@ -29,7 +29,7 @@
     "validator": "^13.15.35"
   },
   "devDependencies": {
-    "@swc/core": "^1.16.0",
+    "@swc/core": "1.15.10",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",
@@ -49,12 +49,8 @@
     "vitest": "^4.1.10"
   },
   "browserslist": [
-    "defaults",
-    "not IE 11",
-    "not op_mini all",
-    "Chrome >= 80",
-    "Firefox >= 80",
-    "safari >= 13"
+    "> 0.2%",
+    "not dead"
   ],
   "scripts": {
     "dev": "concurrently \"bun run watch-scss-module\" \"bun run vite\"",

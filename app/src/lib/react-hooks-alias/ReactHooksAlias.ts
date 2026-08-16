@@ -50,6 +50,7 @@ export function useOnDependenciesChange(callback: () => void, dependencies: Depe
  * @param dependencies The optional dependencies
  */
 export function useEffectWithSsrSupport(callback: () => void, dependencies: DependencyList = []): void {
+  // @ts-expect-error - process is not defined in the browser
   if (typeof process !== 'undefined') {
     // server context
     // eslint-disable-next-line react-hooks/rules-of-hooks

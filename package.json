@@ -20,5 +20,8 @@
     "release": "semantic-release"
   },
   "type": "module",
-  "workspaces": ["app", "api"]
+  "workspaces": ["app", "api"],
+  "overrides": {
+    "@swc/core": "1.15.10"
+  }
 }
