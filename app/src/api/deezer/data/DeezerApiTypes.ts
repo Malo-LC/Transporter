@@ -5,3 +5,8 @@ export type DeezerExportBody = {
 export type DeezerStartExport = {
   taskId: string;
 };
+
+export type DeezerAuth = {
+  isAuthenticated: boolean;
+  userId: string;
+};

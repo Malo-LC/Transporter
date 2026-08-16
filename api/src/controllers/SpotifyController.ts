@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
-import { COOKIE_MAX_AGE, NODE_ENV, SECRET_COOKIE_KEY } from '../config';
+import { COOKIE_MAX_AGE, NODE_ENV, SECRET_COOKIE_KEY, SPOTIFY_USER_ID_COOKIE } from '../config';
 import spotifyApiService from '../service/SpotifyApiService';
 
 type Context = {
@@ -10,7 +10,7 @@ type Context = {
 const spotifyController = new Hono<{ Variables: Context }>();
 
 spotifyController.use('/me', async (c, next) => {
-  const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, 'userId');
+  const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, SPOTIFY_USER_ID_COOKIE);
 
   c.set('userId', userId || undefined); // NOSONARR
   await next();
@@ -20,7 +20,7 @@ spotifyController.get('/me', (c) => {
   const userId = c.get('userId');
 
   if (!userId) {
-    deleteCookie(c, 'userId');
+    deleteCookie(c, SPOTIFY_USER_ID_COOKIE);
     return c.json({
       isAuthenticated: false,
     });
@@ -29,7 +29,7 @@ spotifyController.get('/me', (c) => {
   const isAuthenticated = spotifyApiService.hasAccessToken(userId);
 
   if (!isAuthenticated) {
-    deleteCookie(c, 'userId');
+    deleteCookie(c, SPOTIFY_USER_ID_COOKIE);
   }
 
   return c.json({
@@ -47,7 +47,7 @@ spotifyController.get('/callback', async (c) => {
 
   const userId = await spotifyApiService.fetchAndSetAccessToken(code);
 
-  await setSignedCookie(c, 'userId', userId, SECRET_COOKIE_KEY, {
+  await setSignedCookie(c, SPOTIFY_USER_ID_COOKIE, userId, SECRET_COOKIE_KEY, {
     httpOnly: true,
     path: '/',
     secure: NODE_ENV === 'production',

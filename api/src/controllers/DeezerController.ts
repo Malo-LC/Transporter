@@ -1,8 +1,14 @@
 import { Hono } from 'hono';
-import { getSignedCookie } from 'hono/cookie';
+import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 import { validator } from 'hono/validator';
 import type { WSContext } from 'hono/ws';
-import { SECRET_COOKIE_KEY } from '../config';
+import {
+  COOKIE_MAX_AGE,
+  DEEZER_USER_ID_COOKIE,
+  NODE_ENV,
+  SECRET_COOKIE_KEY,
+  SPOTIFY_USER_ID_COOKIE,
+} from '../config';
 import deezerApiService from '../service/DeezerApiService';
 import { DeezerFileService } from '../service/DeezerFileService';
 import deezerTaskProgressService from '../service/DeezerTaskProgressService';
@@ -12,7 +18,8 @@ import { ErrorCodesEnum } from '../types/GlobalTypes';
 import { validateDeezerFilePlaylistExport, validateDeezerPlaylistExport } from '../validator/deezerValidator';
 
 type Context = {
-  userId: string | undefined;
+  spotifyUserId: string | undefined;
+  deezerUserId: string | undefined;
 };
 
 export type AugmentedDeezerController = Hono<{ Variables: Context }> & {
@@ -21,15 +28,6 @@ export type AugmentedDeezerController = Hono<{ Variables: Context }> & {
 };
 
 const deezerController: AugmentedDeezerController = new Hono<{ Variables: Context }>() as AugmentedDeezerController; // NOSONARR
-
-deezerController.use('*', async (c, next) => {
-  const userId = await getSignedCookie(c, SECRET_COOKIE_KEY, 'userId');
-  if (!userId) {
-    return c.json({ errorCode: ErrorCodesEnum.UNAUTHORIZED }, 401);
-  }
-  c.set('userId', userId);
-  await next();
-});
 
 const registerWebSocketForTask = (taskId: string, ws: WSContext) => {
   deezerTaskProgressService.registerWebSocketForTask(taskId, ws);
@@ -45,10 +43,88 @@ Object.assign(deezerController, {
   unregisterWebSocketForTask,
 });
 
+deezerController.use('/me', async (c, next) => {
+  const deezerUserId = await getSignedCookie(c, SECRET_COOKIE_KEY, DEEZER_USER_ID_COOKIE);
+
+  c.set('deezerUserId', deezerUserId || undefined); // NOSONARR
+  await next();
+});
+
+deezerController.get('/me', (c) => {
+  const deezerUserId = c.get('deezerUserId');
+
+  if (!deezerUserId) {
+    deleteCookie(c, DEEZER_USER_ID_COOKIE);
+    return c.json({
+      isAuthenticated: false,
+    });
+  }
+
+  const isAuthenticated = deezerApiService.hasAccessToken(deezerUserId);
+
+  if (!isAuthenticated) {
+    deleteCookie(c, DEEZER_USER_ID_COOKIE);
+  }
+
+  return c.json({
+    isAuthenticated,
+    userId: deezerUserId,
+  });
+});
+
+deezerController.get('/callback', async (c) => {
+  const code = c.req.query('code');
+
+  if (!code) {
+    return c.json({ message: 'No code provided' }, 400);
+  }
+
+  const userId = await deezerApiService.fetchAndSetAccessToken(code);
+
+  await setSignedCookie(c, DEEZER_USER_ID_COOKIE, userId, SECRET_COOKIE_KEY, {
+    httpOnly: true,
+    path: '/',
+    secure: NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: COOKIE_MAX_AGE,
+  });
+
+  return c.json('Deezer authentication successful', 200);
+});
+
+deezerController.get('/login', async (c) => {
+  const url = deezerApiService.computeLoginOauthUrl();
+  return c.json(url);
+});
+
+deezerController.use('/start-playlist-export', async (c, next) => {
+  const spotifyUserId = await getSignedCookie(c, SECRET_COOKIE_KEY, SPOTIFY_USER_ID_COOKIE);
+  const deezerUserId = await getSignedCookie(c, SECRET_COOKIE_KEY, DEEZER_USER_ID_COOKIE);
+
+  if (!spotifyUserId) {
+    return c.json({ errorCode: ErrorCodesEnum.UNAUTHORIZED }, 401);
+  }
+
+  c.set('spotifyUserId', spotifyUserId);
+  c.set('deezerUserId', deezerUserId || undefined); // NOSONARR
+  await next();
+});
+
+deezerController.use('/file', async (c, next) => {
+  const spotifyUserId = await getSignedCookie(c, SECRET_COOKIE_KEY, SPOTIFY_USER_ID_COOKIE);
+
+  if (!spotifyUserId) {
+    return c.json({ errorCode: ErrorCodesEnum.UNAUTHORIZED }, 401);
+  }
+
+  c.set('spotifyUserId', spotifyUserId);
+  await next();
+});
+
 deezerController.post('/start-playlist-export', validator('json', validateDeezerPlaylistExport), async (c) => {
   const t0 = performance.now();
 
-  const { userId, name, description, isPublic, isLikes, playlistId } = c.req.valid('json');
+  const { userId, deezerUserId, name, description, isPublic, isLikes, playlistId } = c.req.valid('json');
 
   const taskId = `transfer-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
@@ -59,7 +135,7 @@ deezerController.post('/start-playlist-export', validator('json', validateDeezer
     totalSongs: 0,
     webSocketClients: [],
   });
-  const deezerPlaylistTracks: DeezerTracks = await deezerApiService.fetchPlaylist(playlistId);
+  const deezerPlaylistTracks: DeezerTracks = await deezerApiService.fetchPlaylist(deezerUserId, playlistId);
 
   if (!deezerPlaylistTracks.data || deezerPlaylistTracks.data.length === 0) {
     deezerTaskProgressService.updateTaskProgress(taskId, { status: 'error' });

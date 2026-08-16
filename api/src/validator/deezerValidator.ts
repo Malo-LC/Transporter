@@ -1,10 +1,12 @@
 import type { Context } from 'hono';
+import deezerApiService from '../service/DeezerApiService';
 import spotifyApiService from '../service/SpotifyApiService';
 import type { CreateSpotifyPlaylistBody } from '../types/DeezerTypes';
 import { ErrorCodesEnum } from '../types/GlobalTypes';
 
 export async function validateDeezerPlaylistExport<T, U extends Context>(_value: T, c: U) {
-  const userId: string = c.get('userId');
+  const spotifyUserId: string = c.get('spotifyUserId');
+  const deezerUserId: string = c.get('deezerUserId');
 
   const { name, description, public: isPublic = true, isLikes = false, playlistUrl } = await c.req.json<CreateSpotifyPlaylistBody>();
 
@@ -24,16 +26,21 @@ export async function validateDeezerPlaylistExport<T, U extends Context>(_value:
     return c.json({ errorCode: ErrorCodesEnum.DEEZER_PLAYLIST_NAME_MISSING }, 400);
   }
 
-  if (!userId) {
+  if (!spotifyUserId) {
     return c.json({ errorCode: ErrorCodesEnum.UNAUTHORIZED }, 401);
   }
 
-  if (!spotifyApiService.hasAccessToken(userId)) {
+  if (!spotifyApiService.hasAccessToken(spotifyUserId)) {
     return c.json({ errorCode: ErrorCodesEnum.SPOTIFY_ACCESS_TOKEN_MISSING }, 401);
   }
 
+  if (!deezerUserId || !deezerApiService.hasAccessToken(deezerUserId)) {
+    return c.json({ errorCode: ErrorCodesEnum.DEEZER_ACCESS_TOKEN_MISSING }, 401);
+  }
+
   return {
-    userId,
+    userId: spotifyUserId,
+    deezerUserId,
     name,
     description,
     isPublic,
@@ -43,7 +50,7 @@ export async function validateDeezerPlaylistExport<T, U extends Context>(_value:
 }
 
 export async function validateDeezerFilePlaylistExport<T, U extends Context>(_value: T, c: U) {
-  const userId: string = c.get('userId');
+  const spotifyUserId: string = c.get('spotifyUserId');
   const body = await c.req.parseBody();
 
   const name = body.name as string | undefined;
@@ -61,16 +68,16 @@ export async function validateDeezerFilePlaylistExport<T, U extends Context>(_va
     return c.json({ message: 'No playlist name provided' }, 400);
   }
 
-  if (!userId) {
+  if (!spotifyUserId) {
     return c.json({ message: 'User ID is missing' }, 401);
   }
 
-  if (!spotifyApiService.hasAccessToken(userId)) {
+  if (!spotifyApiService.hasAccessToken(spotifyUserId)) {
     return c.json({ message: 'Spotify access token is missing' }, 401);
   }
 
   return {
-    userId,
+    userId: spotifyUserId,
     name,
     description,
     isPublic,

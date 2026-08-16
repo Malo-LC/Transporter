@@ -41,12 +41,17 @@ export type Translations = {
   // home
   home: {
     description: string;
+    loginToDeezer: string;
     loginToSpotify: string;
     title: string;
   };
   deezer: {
+    authSuccess: string;
+    callback: string;
     chooseExportMethod: string;
+    connectedAs: (userId: string | undefined) => string;
     description: string;
+    error: (error: string) => string;
     export: string;
     exportByFile: string;
     exportByUrl: string;
@@ -54,6 +59,7 @@ export type Translations = {
     exporting: string;
     isLikes: string;
     missingTracks: string;
+    noCode: string;
     openPlaylist: string;
     playlistName: string;
     playlistUrl: string;
@@ -140,6 +146,7 @@ export type Translations = {
     DEEZER_PLAYLIST_PARSING_ERROR: string;
     DEEZER_PLAYLIST_URL_INVALID: string;
     DEEZER_PLAYLIST_NAME_MISSING: string;
+    DEEZER_ACCESS_TOKEN_MISSING: string;
     SPOTIFY_ACCESS_TOKEN_MISSING: string;
     SPOTIFY_PLAYLIST_CREATION_ERROR: string;
   };

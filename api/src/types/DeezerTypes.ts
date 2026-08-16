@@ -1,5 +1,11 @@
 import type { WSContext } from 'hono/ws';
 
+export type DeezerUser = {
+  id: number;
+  name?: string;
+  email?: string;
+};
+
 export type DeezerTrack = {
   id: number;
   readable: boolean;

@@ -1,3 +1,5 @@
+import type { DeezerAuth } from '@api/deezer/data/DeezerApiTypes';
+import DeezerApi from '@api/deezer/DeezerApi';
 import type { SpotifyAuth } from '@api/spotify/data/SpotifyTypes';
 import SpotifyApi from '@api/spotify/SpotifyApi';
 import useMessages, { type Messages } from '@i18n/hooks/messagesHook';
@@ -14,14 +16,17 @@ import scss from './home.module.scss';
 
 export default function Home() {
   const spotifyApi: SpotifyApi = getGlobalInstance(SpotifyApi);
+  const deezerApi: DeezerApi = getGlobalInstance(DeezerApi);
 
   const { messages }: Messages = useMessages();
   const { notifyHttpError } = useNotification();
   const loader: LoaderState = useLoader();
   const { panel: Panel, actionButton: Button }: PlumeAdminThemeComponents = usePlumeTheme();
 
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [isSpotifyAuthenticated, setIsSpotifyAuthenticated] = useState<boolean>(false);
+  const [spotifyUserId, setSpotifyUserId] = useState<string | undefined>(undefined);
+  const [isDeezerAuthenticated, setIsDeezerAuthenticated] = useState<boolean>(false);
+  const [deezerUserId, setDeezerUserId] = useState<string | undefined>(undefined);
 
   const loginToSpotify = async () => {
     spotifyApi
@@ -32,22 +37,35 @@ export default function Home() {
       .catch(notifyHttpError);
   };
 
-  const fetchMe = () => {
+  const loginToDeezer = async () => {
+    deezerApi
+      .login()
+      .then((url: string) => {
+        window.location.href = url;
+      })
+      .catch(notifyHttpError);
+  };
+
+  const fetchAuthStatus = () => {
     loader.monitor(
-      spotifyApi
-        .fetchMe()
-        .then((response: SpotifyAuth) => {
-          setIsAuthenticated(response.isAuthenticated);
-          setUserId(response.userId);
+      Promise.all([spotifyApi.fetchMe(), deezerApi.fetchMe()])
+        .then(([spotifyResponse, deezerResponse]: [SpotifyAuth, DeezerAuth]) => {
+          setIsSpotifyAuthenticated(spotifyResponse.isAuthenticated);
+          setSpotifyUserId(spotifyResponse.userId);
+          setIsDeezerAuthenticated(deezerResponse.isAuthenticated);
+          setDeezerUserId(deezerResponse.userId);
         })
         .catch((error: HttpError) => {
           notifyHttpError(error);
-          setIsAuthenticated(false);
+          setIsSpotifyAuthenticated(false);
+          setIsDeezerAuthenticated(false);
         }),
     );
   };
 
-  useOnComponentMounted(fetchMe);
+  useOnComponentMounted(fetchAuthStatus);
+
+  const canExport = isSpotifyAuthenticated && isDeezerAuthenticated;
 
   return (
     <Panel>
@@ -56,18 +74,21 @@ export default function Home() {
           <CircularProgress />
         ) : (
           <>
-            {isAuthenticated ? (
-              <p className={scss.homeConnected}>{messages.spotify.connectedAs(userId)}</p>
+            <h1>{messages.home.title}</h1>
+            <div>{messages.home.description}</div>
+            {isSpotifyAuthenticated ? (
+              <p className={scss.homeConnected}>{messages.spotify.connectedAs(spotifyUserId)}</p>
             ) : (
-              <>
-                <h1>{messages.home.title}</h1>
-                <div>{messages.home.description}</div>
-                <Button onClick={loginToSpotify}>{messages.home.loginToSpotify}</Button>
-              </>
+              <Button onClick={loginToSpotify}>{messages.home.loginToSpotify}</Button>
+            )}
+            {isDeezerAuthenticated ? (
+              <p className={scss.homeConnected}>{messages.deezer.connectedAs(deezerUserId)}</p>
+            ) : (
+              <Button onClick={loginToDeezer}>{messages.home.loginToDeezer}</Button>
             )}
           </>
         )}
-        {isAuthenticated && <DeezerExport />}
+        {canExport && <DeezerExport />}
       </div>
     </Panel>
   );
